@@ -65,7 +65,7 @@ func (this *ArticleController) DoAdd() {
 }
 
 func (this *ArticleController) Edit() {
-	id, err := this.GetInt("id")
+	id, err := this.GetInt64("id")
 	if err != nil {
 		this.Ctx.WriteString("get param id fail")
 		return
@@ -85,7 +85,7 @@ func (this *ArticleController) Edit() {
 }
 
 func (this *ArticleController) DoEdit() {
-	id, err := this.GetInt("id")
+	id, err := this.GetInt64("id")
 	if err != nil {
 		this.Ctx.WriteString("get param id fail")
 		return
@@ -140,7 +140,7 @@ func (this *ArticleController) DoEdit() {
 }
 
 func (this *ArticleController) Del() {
-	id, err := this.GetInt("id")
+	id, err := this.GetInt64("id")
 	if err != nil {
 		this.Ctx.WriteString("get param id fail")
 		return
