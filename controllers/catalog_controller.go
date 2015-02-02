@@ -24,7 +24,7 @@ func (this *CatalogController) Add() {
 }
 
 func (this *CatalogController) Edit() {
-	id, err := this.GetInt("id")
+	id, err := this.GetInt64("id")
 	if err != nil {
 		this.Ctx.WriteString("param id should be digit")
 		return
@@ -42,7 +42,7 @@ func (this *CatalogController) Edit() {
 }
 
 func (this *CatalogController) Del() {
-	id, err := this.GetInt("id")
+	id, err := this.GetInt64("id")
 	if err != nil {
 		this.Ctx.WriteString("param id should be digit")
 		return
@@ -113,7 +113,7 @@ func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, er
 }
 
 func (this *CatalogController) DoEdit() {
-	cid, err := this.GetInt("catalog_id")
+	cid, err := this.GetInt64("catalog_id")
 	if err != nil {
 		this.Ctx.WriteString("catalog_id is illegal")
 		return
