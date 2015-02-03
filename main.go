@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/VincentRuan/beego-blog/g"
+	_ "github.com/VincentRuan/beego-blog/routers"
 	"github.com/astaxie/beego"
-	"github.com/ulricqin/beego-blog/g"
-	_ "github.com/ulricqin/beego-blog/routers"
 )
 
 func main() {

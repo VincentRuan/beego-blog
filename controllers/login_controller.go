@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/ulricqin/beego-blog/g"
+	"github.com/VincentRuan/beego-blog/g"
 )
 
 type LoginController struct {

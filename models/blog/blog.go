@@ -2,9 +2,9 @@ package blog
 
 import (
 	"fmt"
+	"github.com/VincentRuan/beego-blog/g"
+	. "github.com/VincentRuan/beego-blog/models"
 	"github.com/astaxie/beego/orm"
-	"github.com/ulricqin/beego-blog/g"
-	. "github.com/ulricqin/beego-blog/models"
 	"time"
 )
 

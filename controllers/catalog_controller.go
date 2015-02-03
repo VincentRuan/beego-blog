@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/ulricqin/beego-blog/g"
-	"github.com/ulricqin/beego-blog/models"
-	"github.com/ulricqin/beego-blog/models/catalog"
+	"github.com/VincentRuan/beego-blog/g"
+	"github.com/VincentRuan/beego-blog/models"
+	"github.com/VincentRuan/beego-blog/models/catalog"
 	"github.com/ulricqin/goutils/filetool"
 	"time"
 )
