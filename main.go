@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/VincentRuan/beego-blog/g"
-	_ "github.com/VincentRuan/beego-blog/routers"
+	"github.com/vincent3i/beego-blog/g"
+	_ "github.com/vincent3i/beego-blog/routers"
 	"github.com/astaxie/beego"
 )
 

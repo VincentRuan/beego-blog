@@ -2,8 +2,8 @@ package blog
 
 import (
 	"fmt"
-	"github.com/VincentRuan/beego-blog/g"
-	. "github.com/VincentRuan/beego-blog/models"
+	"github.com/vincent3i/beego-blog/g"
+	. "github.com/vincent3i/beego-blog/models"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
