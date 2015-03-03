@@ -6,7 +6,8 @@ import (
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
-	log "github.com/ulricqin/goutils/logtool"
+	//log "github.com/ulricqin/goutils/logtool"
+	"github.com/astaxie/beego/logs"
 	"os"
 )
 
@@ -15,18 +16,24 @@ var blogCacheExpire int64
 var catalogCacheExpire int64
 var RunMode string
 var Cfg = beego.AppConfig
+var Log *logs.BeeLogger
 
 func InitEnv() {
 	var err error
 
 	// log
-	logLevel := Cfg.String("log_level")
-	log.SetLevelWithDefault(logLevel, "info")
+	//logLevel := Cfg.String("log_level")
+	//log.SetLevelWithDefault(logLevel, "info")
+	
+	Log = logs.NewLogger(1024)
+	Log.SetLogger("console", "")
+	Log.SetLevel(7)
 
 	// cache
 	Cache, err = cache.NewCache("memory", `{"interval":60}`)
 	if err != nil {
-		log.Fetal("cache init fail :(")
+		//log.Fetal("cache init fail :(")
+		Log.Error("cache init fail :(")
 		os.Exit(1)
 	}
 	blogCacheExpire, _ = Cfg.Int64("blog_cache_expire")

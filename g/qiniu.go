@@ -16,6 +16,7 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 	if err != nil {
 		return
 	}
-	addr = "http://" + QiniuScope + ".qiniudn.com/" + destName
+	addr = "http://" + QiniuScope + ".qiniudn.com" + destName
+	Log.Debug("Upload file address is --->>> %s", addr)
 	return
 }
