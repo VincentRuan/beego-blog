@@ -127,6 +127,7 @@ func All() []*Catalog {
 		//私有域名访问
 		//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
 		//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
+		// TODO
 		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
 		ret[i].ImgUrl = downloadUrl(g.QiniuScope, string(ret[i].ImgUrl[len("http://vincent/qiniudn.com/"):]))
 		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
