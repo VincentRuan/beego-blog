@@ -12,11 +12,31 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 
 	var ret io.PutRet
 	var extra = new(io.PutExtra)
+
 	err = io.PutFile(nil, &ret, uptoken, destName, localFile, extra)
 	if err != nil {
 		return
 	}
-	addr = "http://" + QiniuScope + ".qiniudn.com" + destName
+
+	//addr = "http://" + QiniuScope + ".qiniudn.com" + destName
+
+	//私有域名访问
+	//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
+	//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
+	if IsQiniuPublicAccess {
+		addr = "http://" + QiniuHttpDomain + "/@" + destName
+	} else {
+		addr = QiniuDownloadUrl(QiniuHttpDomain, "@"+destName)
+	}
+
 	Log.Debug("Upload file address is --->>> %s", addr)
 	return
+}
+
+func QiniuDownloadUrl(domain, key string) string {
+	//Log.Debug("Download domain is --->>> %s", domain)
+	//Log.Debug("Download key is --->>> %s", key)
+	baseUrl := rs.MakeBaseUrl(domain, key)
+	policy := rs.GetPolicy{}
+	return policy.MakeRequest(baseUrl, nil)
 }

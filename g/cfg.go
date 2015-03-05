@@ -2,20 +2,26 @@ package g
 
 import (
 	"github.com/qiniu/api/conf"
+	"regexp"
+	"strings"
 )
 
 var (
-	RootEmail      string
-	RootName       string
-	RootPass       string
-	RootPortrait   string
-	BlogTitle      string
-	BlogResume     string
-	BlogLogo       string
-	QiniuAccessKey string
-	QiniuSecretKey string
-	QiniuScope     string
-	UseQiniu       bool
+	RootEmail              string
+	RootName               string
+	RootPass               string
+	RootPortrait           string
+	BlogTitle              string
+	BlogResume             string
+	BlogLogo               string
+	QiniuAccessKey         string
+	QiniuSecretKey         string
+	QiniuScope             string
+	UseQiniu               bool
+	QiniuHttpDomain        string
+	IsQiniuPublicAccess    bool = true
+	QiniuCatalogUploadPath string
+	LocalCatalogUploadPath string
 )
 
 func initCfg() {
@@ -30,6 +36,22 @@ func initCfg() {
 	QiniuSecretKey = Cfg.String("qiniu_secret_key")
 	QiniuScope = Cfg.String("qiniu_scope")
 	UseQiniu = QiniuAccessKey != "" && QiniuSecretKey != "" && QiniuScope != ""
+	QiniuHttpDomain = strings.Trim(Cfg.String("qiniu_http_domain"), " ")
 	conf.ACCESS_KEY = QiniuAccessKey
 	conf.SECRET_KEY = QiniuSecretKey
+
+	switch strings.ToUpper(Cfg.String("qiniu_access_control")) {
+	case "PRIVATE":
+		IsQiniuPublicAccess = false
+	case "PUBLIC":
+		IsQiniuPublicAccess = true
+	default:
+		IsQiniuPublicAccess = true
+	}
+
+	QiniuCatalogUploadPath = Cfg.String("qiniu_catalog_upload_path")
+	//上传路径将\强制转换成/
+	re, _ := regexp.Compile(`\\+`)
+	LocalCatalogUploadPath = re.ReplaceAllString(Cfg.String("local_catalog_upload_path"), "/")
+
 }

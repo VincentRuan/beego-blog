@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"github.com/vincent3i/beego-blog/g"
 	//.表示可以不用带包名访问里面的变量方法
-	. "github.com/vincent3i/beego-blog/models"
 	"github.com/astaxie/beego/orm"
-	"github.com/qiniu/api/rs"
+	. "github.com/vincent3i/beego-blog/models"
 )
 
 func OneById(id int64) *Catalog {
@@ -84,8 +83,11 @@ func OneByIdentInDB(ident string) *Catalog {
 }
 
 func AllIdsInDB() []int64 {
+	//catalogs := AllCatalogsInDB()
 	var catalogs []Catalog
-	Catalogs().OrderBy("-DisplayOrder").All(&catalogs, "Id")
+	//只查询ID列
+	Catalogs().OrderBy("-DisplayOrder").All(&catalogs, "ID")
+
 	size := len(catalogs)
 	if size == 0 {
 		return []int64{}
@@ -97,6 +99,13 @@ func AllIdsInDB() []int64 {
 	}
 
 	return ret
+}
+
+func AllCatalogsInDB() []*Catalog {
+	var catalogs []*Catalog
+	Catalogs().OrderBy("-DisplayOrder").All(&catalogs)
+
+	return catalogs
 }
 
 func AllIds() []int64 {
@@ -114,25 +123,19 @@ func AllIds() []int64 {
 }
 
 func All() []*Catalog {
-	ids := AllIds()
-	size := len(ids)
-	if size == 0 {
+	fmt.Println(AllIds())
+	catalogsInCache := g.CatalogCacheGet("catalogs")
+	if nil == catalogsInCache {
+		if catalogs := AllCatalogsInDB(); len(catalogs) != 0 {
+			g.CatalogCachePut("catalogs", catalogs)
+
+			return catalogs
+		}
+
 		return []*Catalog{}
 	}
 
-	ret := make([]*Catalog, size)
-	for i := 0; i < size; i++ {
-		ret[i] = OneById(ids[i])
-		
-		//私有域名访问
-		//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
-		//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
-		// TODO
-		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
-		ret[i].ImgUrl = downloadUrl(g.QiniuScope, string(ret[i].ImgUrl[len("http://vincent/qiniudn.com/"):]))
-		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
-	}
-	return ret
+	return catalogsInCache.([]*Catalog)
 }
 
 func Save(this *Catalog) (int64, error) {
@@ -172,10 +175,4 @@ func Update(this *Catalog) error {
 
 func Catalogs() orm.QuerySeter {
 	return orm.NewOrm().QueryTable(new(Catalog))
-}
-
-func downloadUrl(domain, key string) string {
-    baseUrl := rs.MakeBaseUrl(domain, key)
-    policy := rs.GetPolicy{}
-    return  policy.MakeRequest(baseUrl, nil)
 }

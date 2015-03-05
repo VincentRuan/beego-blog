@@ -6,10 +6,10 @@ ulricqin's blog use beego framework
 ## install
 
 ```
-mkdir -p $GOPATH/src/github.com/ulricqin
-cd $GOPATH/src/github.com/ulricqin
+mkdir -p $GOPATH/src/github.com/vincent3i
+cd $GOPATH/src/github.com/vincent3i
 git clone https://github.com/UlricQin/beego-blog.git
-go get github.com/ulricqin/beego-blog/...
+go get github.com/vincent3i/beego-blog/...
 cd beego-blog && modify conf/app.conf
 bee run
 ```
@@ -18,6 +18,6 @@ bee run
 
 ```
 url: /me
-username: UlricQin
+username: vincent
 password: a
 ```
