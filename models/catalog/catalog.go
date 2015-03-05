@@ -128,9 +128,10 @@ func All() []*Catalog {
 		//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
 		//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
 		// TODO
-		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
-		ret[i].ImgUrl = downloadUrl(g.QiniuScope, string(ret[i].ImgUrl[len("http://vincent/qiniudn.com/"):]))
-		g.Log.Debug("Image url is %s", ret[i].ImgUrl)
+		//g.Log.Debug("Image url is %s", ret[i].ImgUrl)
+		//
+		//ret[i].ImgUrl = downloadUrl("vincent.qiniudn.com", "qiniudn.com/static/uploads/catalogs/Programming_1425400606.gif")
+		//g.Log.Debug("Image url is %s", ret[i].ImgUrl)
 	}
 	return ret
 }

@@ -6,8 +6,9 @@ import (
 )
 
 func UploadFile(localFile string, destName string) (addr string, err error) {
-	policy := new(rs.PutPolicy)
-	policy.Scope = QiniuScope
+	//policy := new(rs.PutPolicy)
+	//policy.Scope = QiniuScope
+	policy := rs.PutPolicy{Scope: QiniuScope}
 	uptoken := policy.Token(nil)
 
 	var ret io.PutRet

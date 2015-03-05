@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"strings"
 	//log "github.com/ulricqin/goutils/logtool"
 	"github.com/astaxie/beego/logs"
 	"os"
@@ -22,12 +23,12 @@ func InitEnv() {
 	var err error
 
 	// log
-	//logLevel := Cfg.String("log_level")
+	logLevel := Cfg.String("log_level")
 	//log.SetLevelWithDefault(logLevel, "info")
-	
+
 	Log = logs.NewLogger(1024)
 	Log.SetLogger("console", "")
-	Log.SetLevel(7)
+	Log.SetLevel(getLogLevel(logLevel))
 
 	// cache
 	Cache, err = cache.NewCache("memory", `{"interval":60}`)
@@ -58,4 +59,32 @@ func InitEnv() {
 	}
 
 	initCfg()
+}
+
+func getLogLevel(logLevel string) int {
+	var logLvl int
+
+	switch Log.Debug("Log level is %s", logLevel); strings.ToUpper(logLevel) {
+	case "":
+		logLvl = logs.LevelInformational
+	case "EMERGENCY":
+		logLvl = logs.LevelEmergency
+	case "ALERT":
+		logLvl = logs.LevelAlert
+	case "CRITICAL":
+		logLvl = logs.LevelCritical
+	case "ERROR":
+		logLvl = logs.LevelError
+	case "WARNING":
+		logLvl = logs.LevelWarning
+	case "NOTICE":
+		logLvl = logs.LevelNotice
+	case "INFO":
+		logLvl = logs.LevelInformational
+	case "DEBUG":
+		logLvl = logs.LevelDebug
+	default:
+		logLvl = logs.LevelInformational
+	}
+	return logLvl
 }
