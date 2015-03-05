@@ -2,17 +2,12 @@ package controllers
 
 import (
 	"fmt"
-	"runtime"
+	"github.com/ulricqin/goutils/filetool"
 	"github.com/vincent3i/beego-blog/g"
 	"github.com/vincent3i/beego-blog/models"
 	"github.com/vincent3i/beego-blog/models/catalog"
-	"github.com/ulricqin/goutils/filetool"
 	"strings"
 	"time"
-)
-
-const (
-	CATALOG_IMG_DIR = "F:/dev/dm/beego-blog/static/uploads/catalogs"
 )
 
 type CatalogController struct {
@@ -67,17 +62,17 @@ func (this *CatalogController) Del() {
 }
 
 func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, error) {
-	o := &models.Catalog{}
-	o.Name = this.GetString("name")
-	o.Ident = this.GetString("ident")
-	o.Resume = this.GetString("resume")
-	o.DisplayOrder = this.GetIntWithDefault("display_order", 0)
+	catalog := &models.Catalog{}
+	catalog.Name = this.GetString("name")
+	catalog.Ident = this.GetString("ident")
+	catalog.Resume = this.GetString("resume")
+	catalog.DisplayOrder = this.GetIntWithDefault("display_order", 0)
 
-	if o.Name == "" {
+	if catalog.Name == "" {
 		return nil, fmt.Errorf("name is blank")
 	}
 
-	if o.Ident == "" {
+	if catalog.Ident == "" {
 		return nil, fmt.Errorf("ident is blank")
 	}
 
@@ -88,41 +83,37 @@ func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, er
 
 	if err == nil {
 		ext := filetool.Ext(header.Filename)
-		g.Log.Debug("Saving file into directory %s", CATALOG_IMG_DIR)
-		g.Log.Debug("Current OS is %s", runtime.GOOS)
-		
-		imgPath := fmt.Sprintf("%s/%s_%d%s", CATALOG_IMG_DIR, o.Ident, time.Now().Unix(), ext)
-		
-		filetool.InsureDir(CATALOG_IMG_DIR)
+
+		//g.Log.Debug("Current OS is %s", runtime.GOOS)
+		imgPath := fmt.Sprintf("%s/%s_%d%s", g.LocalCatalogUploadPath, catalog.Ident, time.Now().Unix(), ext)
+		filetool.InsureDir(g.LocalCatalogUploadPath)
 		err = this.SaveToFile("img", imgPath)
+		g.Log.Debug("Saved file as %s", imgPath)
 		if err != nil && imgMust {
 			return nil, err
 		}
 
 		if err == nil {
-			var dest_qiniu_path string
-			if strings.EqualFold("windows", runtime.GOOS) {
-				dest_qiniu_path = string(imgPath[len("F:/dev/dm/beego-blog"):])
-			} else {
-				dest_qiniu_path = imgPath
-			}
-			o.ImgUrl = dest_qiniu_path
-			
+			catalog.ImgUrl = imgPath
+
+			//存储在服务器的文件名
+			qiniuFileName := g.QiniuCatalogUploadPath + imgPath[strings.LastIndex(imgPath, "/"):]
+
 			if g.UseQiniu {
-				if addr, er := g.UploadFile(imgPath, dest_qiniu_path); er != nil {
+				if addr, er := g.UploadFile(imgPath, qiniuFileName); er != nil {
 					if imgMust {
-						g.Log.Error("Upload file to Qiniu error %v", er)
+						g.Log.Error("Upload file [%s] to Qiniu cloud store error %s", imgPath, er.Error())
 						return nil, er
 					}
 				} else {
-					o.ImgUrl = addr
+					catalog.ImgUrl = addr
 					filetool.Unlink(imgPath)
 				}
 			}
 		}
 	}
 
-	return o, nil
+	return catalog, nil
 }
 
 func (this *CatalogController) DoEdit() {

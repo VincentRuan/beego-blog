@@ -5,6 +5,7 @@ package models
 import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/qiniu/api/rs"
 	"time"
 )
 
@@ -61,3 +62,12 @@ func init() {
 // 	orm.RegisterDataBase("default", "mysql", "root:@/beego_blog?charset=utf8&loc=Asia%2FShanghai", 30, 200)
 // 	orm.RunCommand()
 // }
+
+
+func QiniuDownloadUrl(domain, key string) string {
+	//Log.Debug("Download domain is --->>> %s", domain)
+	//Log.Debug("Download key is --->>> %s", key)
+	baseUrl := rs.MakeBaseUrl(domain, key)
+	policy := rs.GetPolicy{}
+	return policy.MakeRequest(baseUrl, nil)
+}
