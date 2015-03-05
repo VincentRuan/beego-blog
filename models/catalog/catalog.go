@@ -152,15 +152,15 @@ func recoverCatalogs(catalogs []*Catalog) []*Catalog {
 		httpDomain = catalog.ImgUrl
 		/*
 
-			//.*://([^/]*).*
-			re, _ = regexp.Compile(`(?i:^http(s)?://).*:([^/]*).*?`)
-			src = []string{"htTps://godoc.org/github.com/bitly/go-simplejson", "http://bbs.chinaunix.net:8989/thread-607693-1-1.html", ""}
-			for _, v := range src {
-				fmt.Println(v)
-				//fmt.Println(strings.Replace(v, "\\", "/", -1))
-				fmt.Println(re.FindAllString(v, -1))
-				fmt.Println(re.FindAllStringSubmatch(v, -1))
-			}
+				//.*://([^/]*).*
+				re, _ = regexp.Compile(`(?i:^http(s)?://).*:([^/]*).*?`)
+				src = []string{"htTps://godoc.org/github.com/bitly/go-simplejson", "http://bbs.chinaunix.net:8989/thread-607693-1-1.html", ""}
+				for _, v := range src {
+					fmt.Println(v)
+					//fmt.Println(strings.Replace(v, "\\", "/", -1))
+					fmt.Println(re.FindAllString(v, -1))
+					fmt.Println(re.FindAllStringSubmatch(v, -1))
+			 	}
 		*/
 
 		catalog.ImgUrl = QiniuDownloadUrl(QiniuHttpDomain, "@"+destName)
