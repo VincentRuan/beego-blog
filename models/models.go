@@ -63,10 +63,9 @@ func init() {
 // 	orm.RunCommand()
 // }
 
-
 func QiniuDownloadUrl(domain, key string) string {
-	//Log.Debug("Download domain is --->>> %s", domain)
-	//Log.Debug("Download key is --->>> %s", key)
+	//g.Log.Debug("Download domain is --->>> %s", domain)
+	//g.Log.Debug("Download key is --->>> %s", key)
 	baseUrl := rs.MakeBaseUrl(domain, key)
 	policy := rs.GetPolicy{}
 	return policy.MakeRequest(baseUrl, nil)

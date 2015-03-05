@@ -3,10 +3,12 @@ package catalog
 import (
 	"fmt"
 	"github.com/vincent3i/beego-blog/g"
+	"net/url"
+	//"strconv"
 	//.表示可以不用带包名访问里面的变量方法
-	. "github.com/vincent3i/beego-blog/models"
 	"github.com/astaxie/beego/orm"
 	"github.com/qiniu/api/rs"
+	. "github.com/vincent3i/beego-blog/models"
 )
 
 func OneById(id int64) *Catalog {
@@ -14,7 +16,9 @@ func OneById(id int64) *Catalog {
 		return nil
 	}
 
-	key := fmt.Sprintf("%d", id)
+	//or used strconv.Itoa to convert int o string
+	//strconv.Itoa(i)
+	key := fmt.Sprintf("id_catalog_%d", id)
 	val := g.CatalogCacheGet(key)
 	if val == nil {
 		if cp := OneByIdInDB(id); cp != nil {
@@ -99,6 +103,13 @@ func AllIdsInDB() []int64 {
 	return ret
 }
 
+func AllCatalogsInDB() []*Catalog {
+	var catalogs []*Catalog
+	Catalogs().OrderBy("-DisplayOrder").All(&catalogs)
+
+	return catalogs
+}
+
 func AllIds() []int64 {
 	val := g.CatalogCacheGet("ids")
 	if val == nil {
@@ -114,26 +125,43 @@ func AllIds() []int64 {
 }
 
 func All() []*Catalog {
-	ids := AllIds()
-	size := len(ids)
-	if size == 0 {
+	catalogsInCache := g.CatalogCacheGet("catalogs")
+	if nil == catalogsInCache {
+		if catalogs := AllCatalogsInDB(); len(catalogs) != 0 {
+			catalogs = tokenValidCatalogs(catalogs)
+			g.CatalogCachePut("catalogs", catalogs)
+			return catalogs
+		}
+
 		return []*Catalog{}
 	}
 
-	ret := make([]*Catalog, size)
-	for i := 0; i < size; i++ {
-		ret[i] = OneById(ids[i])
-		
-		//私有域名访问
-		//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
-		//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
-		// TODO
-		//g.Log.Debug("Image url is %s", ret[i].ImgUrl)
-		//
-		//ret[i].ImgUrl = downloadUrl("vincent.qiniudn.com", "qiniudn.com/static/uploads/catalogs/Programming_1425400606.gif")
-		//g.Log.Debug("Image url is %s", ret[i].ImgUrl)
+	return tokenValidCatalogs(catalogsInCache.([]*Catalog))
+}
+
+//七牛对于私有空间需要token验证
+//使用前请先申请自己的AK/CK、scope
+func tokenValidCatalogs(catalogs []*Catalog) []*Catalog {
+	//私有域名访问
+	//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
+	//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
+	if g.IsQiniuPublicAccess {
+		return catalogs
 	}
-	return ret
+
+	var uri *url.URL
+	var err error
+	for _, catalog := range catalogs {
+		uri, err = url.ParseRequestURI(catalog.ImgUrl)
+		if nil == err {
+			//g.Log.Debug(uri.Path)
+			catalog.ImgUrl = QiniuDownloadUrl(uri.Host, uri.Path[1:])
+		} else {
+			catalog.ImgUrl = "/static/images/golang.jpg"
+		}
+	}
+
+	return catalogs
 }
 
 func Save(this *Catalog) (int64, error) {
@@ -143,6 +171,7 @@ func Save(this *Catalog) (int64, error) {
 	num, err := orm.NewOrm().Insert(this)
 	if err == nil {
 		g.CatalogCacheDel("ids")
+		g.CatalogCacheDel("catalogs")
 	}
 
 	return num, err
@@ -156,6 +185,8 @@ func Del(c *Catalog) error {
 
 	if num > 0 {
 		g.CatalogCacheDel("ids")
+		g.CatalogCacheDel(fmt.Sprintf("id_catalog_%d", c.Id))
+		g.CatalogCacheDel("catalogs")
 	}
 	return nil
 }
@@ -166,7 +197,8 @@ func Update(this *Catalog) error {
 	}
 	_, err := orm.NewOrm().Update(this)
 	if err == nil {
-		g.CatalogCacheDel(fmt.Sprintf("%d", this.Id))
+		g.CatalogCacheDel(fmt.Sprintf("id_catalog_%d", this.Id))
+		g.CatalogCacheDel("catalogs")
 	}
 	return err
 }
@@ -176,7 +208,7 @@ func Catalogs() orm.QuerySeter {
 }
 
 func downloadUrl(domain, key string) string {
-    baseUrl := rs.MakeBaseUrl(domain, key)
-    policy := rs.GetPolicy{}
-    return  policy.MakeRequest(baseUrl, nil)
+	baseUrl := rs.MakeBaseUrl(domain, key)
+	policy := rs.GetPolicy{}
+	return policy.MakeRequest(baseUrl, nil)
 }
