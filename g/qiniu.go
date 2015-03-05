@@ -23,12 +23,7 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 	//私有域名访问
 	//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
 	//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
-	if IsQiniuPublicAccess {
-		addr = "http://" + QiniuHttpDomain + "/@" + destName
-	} else {
-		addr = QiniuDownloadUrl(QiniuHttpDomain, "@"+destName)
-	}
-
+	addr = "http://" + QiniuHttpDomain + "/@" + destName
 	Log.Debug("Upload file address is --->>> %s", addr)
 	return
 }

@@ -123,19 +123,50 @@ func AllIds() []int64 {
 }
 
 func All() []*Catalog {
-	fmt.Println(AllIds())
 	catalogsInCache := g.CatalogCacheGet("catalogs")
 	if nil == catalogsInCache {
 		if catalogs := AllCatalogsInDB(); len(catalogs) != 0 {
+			catalogs = valiadCatalogs(catalogs)
 			g.CatalogCachePut("catalogs", catalogs)
-
 			return catalogs
 		}
 
 		return []*Catalog{}
 	}
 
-	return catalogsInCache.([]*Catalog)
+	return recoverCatalogs(catalogsInCache.([]*Catalog))
+}
+
+//七牛对于私有空间需要token验证
+//使用前请先申请自己的AK/CK、scope
+func recoverCatalogs(catalogs []*Catalog) []*Catalog {
+	//私有域名访问
+	//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
+	//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
+	if g.IsQiniuPublicAccess {
+		return catalogs
+	}
+
+	var httpDomain, key string
+	for _, catalog := range catalogs {
+		httpDomain = catalog.ImgUrl
+		/*
+
+			//.*://([^/]*).*
+			re, _ = regexp.Compile(`(?i:^http(s)?://).*:([^/]*).*?`)
+			src = []string{"htTps://godoc.org/github.com/bitly/go-simplejson", "http://bbs.chinaunix.net:8989/thread-607693-1-1.html", ""}
+			for _, v := range src {
+				fmt.Println(v)
+				//fmt.Println(strings.Replace(v, "\\", "/", -1))
+				fmt.Println(re.FindAllString(v, -1))
+				fmt.Println(re.FindAllStringSubmatch(v, -1))
+			}
+		*/
+
+		catalog.ImgUrl = QiniuDownloadUrl(QiniuHttpDomain, "@"+destName)
+	}
+
+	addr = QiniuDownloadUrl(QiniuHttpDomain, "@"+destName)
 }
 
 func Save(this *Catalog) (int64, error) {
