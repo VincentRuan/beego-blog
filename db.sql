@@ -1,3 +1,5 @@
+create database beego_blog default character set utf8;
+
 CREATE TABLE IF NOT EXISTS `bb_catalog` (
     `id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY,
     `ident` varchar(255) NOT NULL UNIQUE,
@@ -27,3 +29,7 @@ CREATE TABLE IF NOT EXISTS `bb_blog_content` (
    `id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY,
    `content` longtext NOT NULL
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+#server: XXXX is not allowed to connect to this MySQLserver
+GRANT ALL PRIVILEGES ON beego_blog.* TO 'vincent'@'[ip or hostname]' IDENTIFIED BY 'wHs9rx2$' WITH GRANT OPTION;
+FLUSH PRIVILEGES;

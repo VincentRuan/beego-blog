@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/vincent3i/beego-blog/g"
 	"net/url"
+	//"strings"
 	//"strconv"
 	//.表示可以不用带包名访问里面的变量方法
 	"github.com/astaxie/beego/orm"
@@ -155,7 +156,12 @@ func tokenValidCatalogs(catalogs []*Catalog) []*Catalog {
 		uri, err = url.ParseRequestURI(catalog.ImgUrl)
 		if nil == err {
 			//g.Log.Debug(uri.Path)
-			catalog.ImgUrl = QiniuDownloadUrl(uri.Host, uri.Path[1:])
+			if len(uri.Path) > 1 {
+				catalog.ImgUrl = QiniuDownloadUrl(uri.Host, uri.Path[1:])
+			} else {
+				catalog.ImgUrl = "/static/images/golang.jpg"
+			}
+
 		} else {
 			catalog.ImgUrl = "/static/images/golang.jpg"
 		}
