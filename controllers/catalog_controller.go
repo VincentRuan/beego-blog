@@ -108,6 +108,7 @@ func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, er
 				} else {
 					catalog.ImgUrl = addr
 					filetool.Unlink(imgPath)
+					g.Log.Debug("Uploaded file [%s] success, remove file from [%s].", qiniuFileName, imgPath)
 				}
 			}
 		}

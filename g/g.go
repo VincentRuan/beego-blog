@@ -48,11 +48,14 @@ func InitEnv() {
 	dbName := Cfg.String("db_name")
 	maxIdleConn, _ := Cfg.Int("db_max_idle_conn")
 	maxOpenConn, _ := Cfg.Int("db_max_open_conn")
-	dbLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&loc=Asia%%2FChongqing", dbUser, dbPass, dbHost, dbPort, dbName)
-	Log.Debug("dbLink ---->>> %s .", dbLink)
+	dbLink := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&loc=Asia%%2FChongqing&allowOldPasswords=true", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	orm.RegisterDriver("mysql", orm.DR_MySQL)
-	orm.RegisterDataBase("default", "mysql", dbLink, maxIdleConn, maxOpenConn)
+	err = orm.RegisterDataBase("default", "mysql", dbLink, maxIdleConn, maxOpenConn)
+	if nil != err {
+		Log.Error(err.Error())
+	}
+	Log.Debug("dbLink ---->>> %s .", dbLink)
 
 	RunMode = Cfg.String("runmode")
 	if RunMode == "dev" {
