@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS `bb_blog` (
    `type` tinyint NOT NULL,
    `status` tinyint NOT NULL,
    `views` bigint NOT NULL,
-   `created` datetime NOT NULL
+   `created` datetime NOT NULL,
+   `snap_shot` varchar(2048)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 CREATE INDEX `bb_blog_catalog_id` ON `bb_blog` (`catalog_id`);
 
@@ -30,6 +31,11 @@ CREATE TABLE IF NOT EXISTS `bb_blog_content` (
    `content` longtext NOT NULL
 ) ENGINE=INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
-#server: XXXX is not allowed to connect to this MySQLserver
-GRANT ALL PRIVILEGES ON beego_blog.* TO 'vincent'@'[ip or hostname]' IDENTIFIED BY 'wHs9rx2$' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
+create table rss_feeder_t (
+	`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	rss_desc varchar(1024),
+    `rss_url` varchar(1024) NOT NULL,
+    create_time timestamp not null default now(),
+	update_time timestamp,
+    subscribe_time timestamp
+) ENGINE=INNODB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

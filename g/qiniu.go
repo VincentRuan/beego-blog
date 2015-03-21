@@ -1,6 +1,7 @@
 package g
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/qiniu/api/io"
 	"github.com/qiniu/api/rs"
 )
@@ -25,6 +26,6 @@ func UploadFile(localFile string, destName string) (addr string, err error) {
 	//http://developer.qiniu.com/docs/v6/api/reference/security/download-token.html
 	//http://developer.qiniu.com/docs/v6/sdk/go-sdk.html#io-get-private
 	addr = "http://" + QiniuHttpDomain + "/@" + destName
-	Log.Debug("Upload file address is --->>> %s", addr)
+	beego.BeeLogger.Debug("Upload file address is --->>> %s", addr)
 	return
 }

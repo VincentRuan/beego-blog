@@ -2,7 +2,12 @@
 {{range .Blogs}}
 <div class="item" itemscope="" itemtype="http://schema.org/Article">
     <h2 class="entry-title" itemprop="name">
-        <a class="icon-link" href="/article/{{.Ident}}" itemprop="url" style="text-decoration: none;">{{.Title}}</a>
+        <a class="icon-link" href="/article/{{.Ident}}" itemprop="url" style="text-decoration: none;">
+		{{if eq .Type 0}}[原创]{{end}}
+		{{if eq .Type 1}}[翻译]{{end}}
+		{{if eq .Type 2}}[转载]{{end}}
+			{{.Title}}
+		</a>
     </h2>
     <div class="entry-views">{{.Views}}</div>
 

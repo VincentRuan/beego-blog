@@ -11,8 +11,10 @@ type MainController struct {
 }
 
 func (this *MainController) Get() {
-	this.Data["Catalogs"] = catalog.All()
+	catalogs := catalog.All()
+	this.Data["Catalogs"] = catalogs
 	this.Data["PageTitle"] = "首页"
+	this.Data["CatalogSize"] = len(catalogs)
 	this.Layout = "layout/default.html"
 	this.TplNames = "index.html"
 }

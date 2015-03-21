@@ -22,5 +22,34 @@
             
         </div>
         {{end}}
+		{{if $.IsAdmin}}
+		<div id="rss_div" class="collection-card" itemscope="" itemtype="http://schema.org/CollectionPage">
+            <a style="border-top:1px solid #eee;border-bottom:1px solid #eee;" href="javascript:;"><img class="cover" src="/static/images/rss.jpg" alt="查看RSS订阅"></a>
+            <div class="card-info">
+                <a href="javascript:;"><h3 class="collection-name">RSS</h3></a>
+                <p class="description">
+                    查看RSS订阅内容
+                </p>
+            </div>
+        </div>
+		<div class="collection-card" itemscope="" itemtype="http://schema.org/CollectionPage">
+            <a style="border-top:1px solid #eee;border-bottom:1px solid #eee;" href="/me/catalog/add"><img class="cover" src="/static/images/addcatalog.jpg" alt="添加分类"></a>
+            <div class="card-info">
+                <a href="/me/catalog/add"><h3 class="collection-name">添加分类</h3></a>
+                <p class="description">
+                    当前分类总数 : {{.CatalogSize}}
+                </p>
+            </div>
+        </div>
+		<div class="collection-card" itemscope="" itemtype="http://schema.org/CollectionPage">
+            <a style="border-top:1px solid #eee;border-bottom:1px solid #eee;" href="/me/article/add"><img class="cover" src="/static/images/addarticle.jpg" alt="添加文章"></a>
+            <div class="card-info">
+                <a href="/me/article/add"><h3 class="collection-name">添加文章</h3></a>
+                <p class="description">
+                    嘿！你的益达！
+                </p>
+            </div>
+        </div>
+		{{end}}
     </div>
 </div>

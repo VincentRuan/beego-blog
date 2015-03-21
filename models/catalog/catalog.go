@@ -2,10 +2,9 @@ package catalog
 
 import (
 	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/vincent3i/beego-blog/g"
 	"net/url"
-	//"strings"
-	//"strconv"
 	//.表示可以不用带包名访问里面的变量方法
 	"github.com/astaxie/beego/orm"
 	"github.com/qiniu/api/rs"
@@ -130,7 +129,10 @@ func All() []*Catalog {
 	if nil == catalogsInCache {
 		if catalogs := AllCatalogsInDB(); len(catalogs) != 0 {
 			catalogs = tokenValidCatalogs(catalogs)
-			g.CatalogCachePut("catalogs", catalogs)
+			err := g.CatalogCachePut("catalogs", catalogs)
+			if nil != err {
+				beego.Error(err)
+			}
 			return catalogs
 		}
 

@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"github.com/vincent3i/beego-blog/controllers"
 	"github.com/astaxie/beego"
+	"github.com/vincent3i/beego-blog/controllers"
 )
 
 func init() {
@@ -24,4 +24,7 @@ func init() {
 	beego.Router("/me/article/edit", &controllers.ArticleController{}, "get:Edit;post:DoEdit")
 	beego.Router("/me/article/del", &controllers.ArticleController{}, "get:Del")
 	beego.Router("/me/article/draft", &controllers.ArticleController{}, "get:Draft")
+
+	beego.Router("/me/rss", &controllers.RSSController{}, "get:LoadPage")
+	beego.Router("/me/rss/read", &controllers.RSSController{}, "get,post:Read")
 }

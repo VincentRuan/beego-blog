@@ -33,6 +33,15 @@ type Blog struct {
 	Created               time.Time `orm:"auto_now_add;type(datetime)"`
 }
 
+type RssFeeder struct {
+	Id            int64
+	RSSDesc       string `orm:"column(rss_desc)"`
+	RSSUrl        string `orm:"column(rss_url)"`
+	CreateTime    time.Time
+	UpdateTime    time.Time
+	SubscribeTime time.Time
+}
+
 type BlogContent struct {
 	Id      int64
 	Content string `orm:"type(text)"`
@@ -56,6 +65,11 @@ func engine() string {
 
 func init() {
 	orm.RegisterModelWithPrefix("bb_", new(Catalog), new(Blog), new(BlogContent))
+	orm.RegisterModel(new(RssFeeder))
+}
+
+func (this *RssFeeder) TableName() string {
+	return "rss_feeder_t"
 }
 
 // func main() {

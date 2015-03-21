@@ -1,8 +1,8 @@
 package g
 
 const (
-	blogPrefix    = "b_"
-	catalogPrefix = "c_"
+	blogPrefix    = "blog_"
+	catalogPrefix = "catalog_"
 )
 
 func BlogCachePut(key string, val interface{}) error {
@@ -28,5 +28,3 @@ func CatalogCacheDel(key string) error {
 func BlogCacheDel(key string) error {
 	return Cache.Delete(blogPrefix + key)
 }
-
-

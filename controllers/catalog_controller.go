@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/ulricqin/goutils/filetool"
 	"github.com/vincent3i/beego-blog/g"
 	"github.com/vincent3i/beego-blog/models"
@@ -84,11 +85,11 @@ func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, er
 	if err == nil {
 		ext := filetool.Ext(header.Filename)
 
-		//g.Log.Debug("Current OS is %s", runtime.GOOS)
+		//beego.Debug("Current OS is %s", runtime.GOOS)
 		imgPath := fmt.Sprintf("%s/%s_%d%s", g.LocalCatalogUploadPath, catalog.Ident, time.Now().Unix(), ext)
 		filetool.InsureDir(g.LocalCatalogUploadPath)
 		err = this.SaveToFile("img", imgPath)
-		g.Log.Debug("Saved file as %s", imgPath)
+		beego.BeeLogger.Debug("Saved file as %s", imgPath)
 		if err != nil && imgMust {
 			return nil, err
 		}
@@ -102,13 +103,13 @@ func (this *CatalogController) extractCatalog(imgMust bool) (*models.Catalog, er
 			if g.UseQiniu {
 				if addr, er := g.UploadFile(imgPath, qiniuFileName); er != nil {
 					if imgMust {
-						g.Log.Error("Upload file [%s] to Qiniu cloud store error %s", imgPath, er.Error())
+						beego.BeeLogger.Error("Upload file [%s] to Qiniu cloud store error %s", imgPath, er.Error())
 						return nil, er
 					}
 				} else {
 					catalog.ImgUrl = addr
 					filetool.Unlink(imgPath)
-					g.Log.Debug("Uploaded file [%s] success, remove file from [%s].", qiniuFileName, imgPath)
+					beego.BeeLogger.Debug("Uploaded file [%s] success, remove file from [%s].", qiniuFileName, imgPath)
 				}
 			}
 		}

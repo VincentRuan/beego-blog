@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"github.com/vincent3i/beego-blog/g"
 	"github.com/astaxie/beego"
 	"github.com/ulricqin/goutils/paginator"
+	"github.com/vincent3i/beego-blog/g"
+	"github.com/vincent3i/beego-blog/models/admin"
 	"strconv"
 )
 
@@ -20,9 +21,7 @@ func (this *BaseController) Prepare() {
 	this.Data["BlogLogo"] = g.BlogLogo
 	this.Data["BlogTitle"] = g.BlogTitle
 	this.Data["BlogResume"] = g.BlogResume
-	this.Data["RootName"] = g.RootName
-	this.Data["RootEmail"] = g.RootEmail
-	this.Data["RootPortrait"] = g.RootPortrait
+
 	this.AssignIsAdmin()
 	if app, ok := this.AppController.(Checker); ok {
 		app.CheckLogin()
@@ -30,18 +29,24 @@ func (this *BaseController) Prepare() {
 }
 
 func (this *BaseController) AssignIsAdmin() {
-	bb_name := this.Ctx.GetCookie("bb_name")
-	bb_password := this.Ctx.GetCookie("bb_password")
-	if bb_name == "" || bb_password == "" {
-		this.IsAdmin = false
-		return
+	if sess := this.GetSession("username"); sess != nil {
+		beego.BeeLogger.Debug("Retrive user name [%s] from session", sess.(string))
+		this.IsAdmin = true
+	} else {
+		//从cookie中获取
+		bb_name := this.Ctx.GetCookie("bb_name")
+		bb_password := this.Ctx.GetCookie("bb_password")
+		if bb_name == "" || bb_password == "" {
+			this.IsAdmin = false
+		} else {
+			this.IsAdmin = admin.CheckAdminUser(bb_name, bb_password, "host")
+			if this.IsAdmin {
+				this.SetSession("username", bb_name)
+				beego.BeeLogger.Debug("Put user name [%s] into session", bb_name)
+			}
+		}
 	}
-
-	if bb_name != g.RootName || bb_password != g.RootPass {
-		this.IsAdmin = false
-	}
-
-	this.IsAdmin = true
+	beego.BeeLogger.Debug("Is Admin [%t]", this.IsAdmin)
 	this.Data["IsAdmin"] = this.IsAdmin
 }
 

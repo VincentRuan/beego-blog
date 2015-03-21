@@ -1,0 +1,17 @@
+{
+    "tasks": [
+        {
+            "id": "id1",
+            "expressions": [
+                "0 5 * * * *",
+                "@every 10m"
+            ]
+        },
+        {
+            "id": "id2",
+            "expressions": [
+                "@every 2m"
+            ]
+        }
+    ]
+}

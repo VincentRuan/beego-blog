@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="/static/css/plugins/bootstrap/bootstrap-table.css">
+<link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+<script src="/static/javascript/plugins/bootstrap/bootstrap-table.js"></script>
+<script src="/static/javascript/plugins/bootstrap/extensions/export/bootstrap-table-export.js"></script>
+<script src="//rawgit.com/kayalshri/tableExport.jquery.plugin/master/tableExport.js"></script>
+<script src="//rawgit.com/kayalshri/tableExport.jquery.plugin/master/jquery.base64.js"></script>
+<script src="/static/javascript/plugins/bootstrap/extensions/editable/bootstrap-table-editable.js"></script>
+<script src="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable.js"></script>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/json2/20140204/json2.min.js"></script>
+<![endif]-->
+
+<div>
+    <h1>Bootstrap Table Examples <a href="https://github.com/wenzhixin/bootstrap-table-examples" class="btn btn-primary" role="button" target="_blank">Learn more &raquo;</a></h1>
+    <div id="toolbar">
+        <button id="remove" class="btn btn-danger" disabled>
+            <i class="glyphicon glyphicon-remove"></i> Delete
+        </button>
+    </div>
+    <table id="table"
+           data-toggle="table"
+           data-toolbar="#toolbar"
+           data-search="true"
+           data-show-refresh="true"
+           data-show-toggle="true"
+           data-show-columns="true"
+           data-show-export="true"
+           data-show-pagination-switch="true"
+           data-pagination="true"
+           data-side-pagination="server"
+           data-url="{{urlfor "RSSController.Read"}}">
+        <thead>
+        <tr>
+            <th data-field="Id" data-checkbox="true"></th>
+            <th data-field="RSSDesc" data-sortable="true" data-editable="true">RSS描述</th>
+            <th data-field="RSSUrl" data-editable="true">RSS地址</th>
+            <th data-field="CreateTime" data-sortable="true">创建时间</th>
+			<th data-field="UpdateTime" data-sortable="true">最后一次更新时间</th>
+			<th data-field="SubscribeTime" data-sortable="true">最后订阅更新时间</th>
+            <th data-field="operate" data-formatter="operateFormatter"
+                data-events="operateEvents">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+
+<script>
+    var $table = $('#table'),
+        $remove = $('#remove');
+
+    $(function () {
+        $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        });
+        $remove.click(function () {
+            var ids = $.map($table.bootstrapTable('getSelections'), function (row) {
+                return row.id
+            });
+            $table.bootstrapTable('remove', {
+                field: 'id',
+                values: ids
+            });
+            $remove.prop('disabled', true);
+        });
+    });
+
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="like" href="javascript:void(0)" title="Like">',
+            '<i class="glyphicon glyphicon-heart"></i>',
+            '</a>  ',
+            '<a class="remove" href="javascript:void(0)" title="Remove">',
+            '<i class="glyphicon glyphicon-remove"></i>',
+            '</a>'
+        ].join('');
+    }
+
+    window.operateEvents = {
+        'click .like': function (e, value, row, index) {
+            alert('You click like action, row: ' + JSON.stringify(row));
+        },
+        'click .remove': function (e, value, row, index) {
+            $table.bootstrapTable('remove', {
+                field: 'id',
+                values: [row.id]
+            });
+        }
+    };
+</script>

@@ -1,7 +1,7 @@
 beego-blog
 ==========
 
-ulricqin's blog use beego framework
+vincent's blog use beego framework
 
 ## install
 

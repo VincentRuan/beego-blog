@@ -4,6 +4,30 @@
     <title>{{.PageTitle}} - {{.BlogTitle}}</title>
     <link rel="stylesheet" type="text/css" href="/static/css/ee22d.css">
     <link rel="stylesheet" href="/static/css/g.css"/>
+	<!--<link href="/static/css/font-awesome.css" rel="stylesheet">-->
+	<link rel="stylesheet" href="/static/css/totop/manhuatoTop.1.0.css"/>
+    <script type="text/javascript" src="/static/javascript/lib.min.js"></script>
+	<script type="text/javascript" src="/static/javascript/totop/manhuatoTop.1.0.js"></script>
+	<script type="text/javascript" src="/static/javascript/spin.js"></script>
+	<script type="text/javascript" src="/static/javascript/jquery.spin.js"></script>
+	<script type="text/javascript">	
+	$.fn.spin.presets.flower = {
+ 	 	lines: 12,
+  		length: 20,
+  		width: 15,
+  		radius: 0
+	}
+	
+	$(function (){
+		$(window).manhuatoTop({
+			showHeight : 100,//设置滚动高度时显示
+			speed : 500 //返回顶部的速度以毫秒为单位
+		});
+		
+		$('#rss_div').spin('flower', 'red');
+	});
+		
+	</script>
     <link rel="shortcut icon" href="/static/favicon.ico">
     <style>
         #screen{margin:0 auto; width:630px; }
