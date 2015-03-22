@@ -1,11 +1,13 @@
 <link rel="stylesheet" href="/static/css/plugins/bootstrap/bootstrap-table.css">
-<link rel="stylesheet" href="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/css/bootstrap-editable.css">
+<link rel="stylesheet" href="/static/css/plugins/bootstrap/bootstrap-editable.css">
+<link rel="stylesheet" type="text/css" href="/static/css/plugins/bootstrap/bootstrap-dialog.css">
 <script src="/static/javascript/plugins/bootstrap/bootstrap-table.js"></script>
 <script src="/static/javascript/plugins/bootstrap/extensions/export/bootstrap-table-export.js"></script>
-<script src="//rawgit.com/kayalshri/tableExport.jquery.plugin/master/tableExport.js"></script>
-<script src="//rawgit.com/kayalshri/tableExport.jquery.plugin/master/jquery.base64.js"></script>
+<script src="/static/javascript/plugins/bootstrap/tableExport.js"></script>
+<script src="/static/javascript/plugins/jquery.base64.js"></script>
 <script src="/static/javascript/plugins/bootstrap/extensions/editable/bootstrap-table-editable.js"></script>
-<script src="//rawgit.com/vitalets/x-editable/master/dist/bootstrap3-editable/js/bootstrap-editable.js"></script>
+<script src="/static/javascript/plugins/bootstrap/bootstrap-editable.js"></script>
+<script src="/static/javascript/plugins/bootstrap/bootstrap-dialog.js"></script>
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -15,7 +17,7 @@
 <![endif]-->
 
 <div>
-    <h1>Bootstrap Table Examples <a href="https://github.com/wenzhixin/bootstrap-table-examples" class="btn btn-primary" role="button" target="_blank">Learn more &raquo;</a></h1>
+    <h1><a href="https://github.com/wenzhixin/bootstrap-table-examples" class="btn btn-primary btn-lg" role="button" target="_blank"><i class="glyphicon glyphicon-fire"></i>&nbsp;&nbsp;Learn more &raquo;</a></h1>
     <div id="toolbar">
         <button id="remove" class="btn btn-danger" disabled>
             <i class="glyphicon glyphicon-remove"></i> Delete
@@ -34,15 +36,15 @@
            data-side-pagination="server"
            data-url="{{urlfor "RSSController.Read"}}">
         <thead>
-        <tr>
-            <th data-field="Id" data-checkbox="true"></th>
-            <th data-field="RSSDesc" data-sortable="true" data-editable="true">RSS描述</th>
-            <th data-field="RSSUrl" data-editable="true">RSS地址</th>
-            <th data-field="CreateTime" data-sortable="true">创建时间</th>
-			<th data-field="UpdateTime" data-sortable="true">最后一次更新时间</th>
-			<th data-field="SubscribeTime" data-sortable="true">最后订阅更新时间</th>
+        <tr align="center">
+            <th data-field="id" data-checkbox="true"></th>
+            <th data-field="rss_desc" data-sortable="true" data-editable="true">RSS描述</th>
+            <th data-field="rss_url" data-editable="true">RSS地址</th>
+            <th data-field="create_time" data-sortable="true" data-visible="false" data-align="center">创建时间</th>
+			<th data-field="update_time" data-sortable="true" data-align="center">最后一次更新时间</th>
+			<th data-field="subscribe_time" data-sortable="true" data-align="center">最后订阅更新时间</th>
             <th data-field="operate" data-formatter="operateFormatter"
-                data-events="operateEvents">操作</th>
+                data-events="operateEvents" data-align="center">操作</th>
         </tr>
         </thead>
     </table>
@@ -73,6 +75,11 @@
             '<a class="like" href="javascript:void(0)" title="Like">',
             '<i class="glyphicon glyphicon-heart"></i>',
             '</a>  ',
+			,
+            '<a class="ok" href="javascript:void(0)" title="ok">',
+            '<i class="glyphicon glyphicon-ok"></i>',
+            '</a>  '
+			,
             '<a class="remove" href="javascript:void(0)" title="Remove">',
             '<i class="glyphicon glyphicon-remove"></i>',
             '</a>'
@@ -81,13 +88,49 @@
 
     window.operateEvents = {
         'click .like': function (e, value, row, index) {
-            alert('You click like action, row: ' + JSON.stringify(row));
+            window.location.href = '/me/rss/detail/' + row.id
+        },
+		'click .ok': function (e, value, row, index) {
+            console.log('You click ok action, row: ' + JSON.stringify(row));
+			BootstrapDialog.confirm('Update row [' + row.rss_desc + '], are you sure?', function(result){
+           		if(result) {
+                	$.post('{{urlfor "RSSController.DoEdit"}}', row, function(data, textStatus) {
+						console.log("status---" + textStatus)
+						if(data.status == "fail") {
+							alert(data.result)
+						}
+					}, "json");
+            	}
+        	});
         },
         'click .remove': function (e, value, row, index) {
-            $table.bootstrapTable('remove', {
-                field: 'id',
-                values: [row.id]
-            });
+			BootstrapDialog.confirm({
+            	title: 'WARNING',
+            	message: 'Warning! Remove your rss data?',
+            	type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+            	closable: true, // <-- Default value is false
+            	draggable: true, // <-- Default value is false
+            	btnCancelLabel: 'Do not remove it!', // <-- Default value is 'Cancel',
+            	btnOKLabel: 'Remove it!', // <-- Default value is 'OK',
+            	btnOKClass: 'btn-warning', // <-- If you didn't specify it, dialog type will be used,
+            	callback: function(result) {
+                	// result will be true if button was click, while it will be false if users close the dialog directly.
+                	if(result) {
+                    	$.post('{{urlfor "RSSController.DoDel"}}', {"id" : row.id}, function(data, textStatus) {
+							if(data.status == "fail") {
+								alert(data.result)
+							} else if(data.status == "success") {
+								$table.bootstrapTable('remove', {
+               	 					field: 'id',
+                					values: [row.id]
+            					});
+							} else {
+								BootstrapDialog.alert('Unknown statuc ' + data + '!');
+							}
+						}, "json");
+                	}
+            	}
+       	 	});
         }
     };
 </script>

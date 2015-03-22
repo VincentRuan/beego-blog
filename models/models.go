@@ -1,7 +1,5 @@
 package models
 
-// package main
-
 import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
@@ -34,12 +32,12 @@ type Blog struct {
 }
 
 type RssFeeder struct {
-	Id            int64
-	RSSDesc       string `orm:"column(rss_desc)"`
-	RSSUrl        string `orm:"column(rss_url)"`
-	CreateTime    time.Time
-	UpdateTime    time.Time
-	SubscribeTime time.Time
+	Id            int64     `json:"id" form:"id"`
+	RSSDesc       string    `orm:"column(rss_desc)" json:"rss_desc" valid:"Required" form:"rss_desc"`
+	RSSUrl        string    `orm:"column(rss_url)" json:"rss_url" valid:"Required" form:"rss_url"`
+	CreateTime    time.Time `orm:"column(create_time)"json:"create_time" form:"-"`
+	UpdateTime    time.Time `orm:"column(update_time)"json:"update_time" form:"-"`
+	SubscribeTime time.Time `orm:"column(subscribe_time)"json:"subscribe_time" form:"-"`
 }
 
 type BlogContent struct {

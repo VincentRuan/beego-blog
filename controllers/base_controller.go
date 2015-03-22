@@ -78,3 +78,25 @@ func (this *BaseController) JsStorage(action, key string, values ...string) {
 	}
 	this.Ctx.SetCookie("JsStorage", value, 1<<31-1, "/")
 }
+
+//返回分页参数
+func (this *BaseController) GetPaginationParam() (limit, offset int) {
+	var err error
+	limit, err = this.GetInt("limit")
+	if err != nil {
+		beego.Info("Unable to format limit from parameters, use -1 as default!", err)
+		limit = -1
+	}
+	offset, err = this.GetInt("offset")
+	if err != nil {
+		beego.Info("Unable to format offset from parameters, use 0 as default!", err)
+		offset = 0
+	}
+
+	if limit == 0 {
+		beego.Info("limit 0 is illegal, change to -1 as default!")
+		limit = -1
+	}
+
+	return
+}

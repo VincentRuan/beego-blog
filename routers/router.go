@@ -27,4 +27,7 @@ func init() {
 
 	beego.Router("/me/rss", &controllers.RSSController{}, "get:LoadPage")
 	beego.Router("/me/rss/read", &controllers.RSSController{}, "get,post:Read")
+	beego.Router("/me/rss/edit", &controllers.RSSController{}, "post:DoEdit")
+	beego.Router("/me/rss/del", &controllers.RSSController{}, "post:DoDel")
+	beego.Router("/me/rss/detail/:id([0-9]+)", &controllers.RSSController{}, "get:RSSData")
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/robfig/cron"
+	"github.com/vincent3i/beego-blog/handler"
+	"github.com/vincent3i/beego-blog/models/rss"
 	"io/ioutil"
 	"time"
 )
@@ -47,8 +49,21 @@ func InitTasks() {
 		}
 		c.Start()
 	}
+
+	c = cron.New()
+	c.AddFunc("0 30 * * * *", feed)
+	c.Start()
 }
 
 func p() {
 	fmt.Println(fmt.Sprintf("%s", time.Now().Format("2006-01-02 15:04:05")))
+}
+
+func feed() {
+	rfs := rss.AllRssFeeder()
+	for i, rf := range rfs {
+		beego.BeeLogger.Debug("Fetch rss [%d] by url [%s]", i, rf.RSSUrl)
+		//抓取RSS内容
+		handler.BlogRssFeed(rf.RSSUrl, 3600, rf)
+	}
 }
