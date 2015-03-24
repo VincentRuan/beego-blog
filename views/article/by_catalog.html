@@ -20,7 +20,8 @@
       {{end}}
     </div>
     <a class="entry-snippet" itemprop="description" href="/article/{{.Ident}}">
-      {{substr .Content.Content 0 300}}...
+		<!--substr .Content.Content 0 300-->
+      {{.SnapShot}}...
     </a>
   </div>
 {{end}}

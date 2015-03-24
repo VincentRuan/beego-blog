@@ -2,9 +2,10 @@ package blog
 
 import (
 	"fmt"
+	"github.com/astaxie/beego/orm"
+	"github.com/ulricqin/goutils/strtool"
 	"github.com/vincent3i/beego-blog/g"
 	. "github.com/vincent3i/beego-blog/models"
-	"github.com/astaxie/beego/orm"
 	"time"
 )
 
@@ -187,6 +188,10 @@ func Save(this *Blog, blogContent string) (int64, error) {
 	this.BlogContentId = blogContentId
 	this.BlogContentLastUpdate = time.Now().Unix()
 
+	//re, _ := regexp.Compile("\\s{2,}")
+	//this.SnapShot = re.ReplaceAllString(blogContent, "")[:300]
+	this.SnapShot = string([]rune(blogContent)[:300])
+
 	id, err := or.Insert(this)
 	if err == nil {
 		g.BlogCacheDel(fmt.Sprintf("article_ids_of_%d", this.CatalogId))
@@ -215,13 +220,15 @@ func Update(b *Blog, content string) error {
 	}
 
 	bc := ReadBlogContent(b)
-	if content != "" && bc.Content != content {
+	if content != "" && !compareContent(bc.Content, content) {
 		bc.Content = content
 		_, e := orm.NewOrm().Update(bc)
 		if e != nil {
 			return e
 		}
 		b.BlogContentLastUpdate = time.Now().Unix()
+
+		b.SnapShot = string([]rune(content)[:300])
 	}
 
 	_, err := orm.NewOrm().Update(b)
@@ -229,6 +236,22 @@ func Update(b *Blog, content string) error {
 		g.BlogCacheDel(fmt.Sprintf("%d", b.Id))
 	}
 	return err
+}
+
+//比较输入的文本内容
+//如果字符串长度大于10W则比较其MD5
+func compareContent(origContent, targetContent string) bool {
+	if len(targetContent) > 100000 || len(origContent) > 100000 {
+		targetMD5 := strtool.Md5(targetContent)
+		origMD5 := strtool.Md5(origContent)
+		if targetMD5 == origMD5 {
+			return true
+		}
+
+		return false
+	}
+
+	return origContent == targetContent
 }
 
 func Blogs() orm.QuerySeter {

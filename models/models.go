@@ -29,6 +29,7 @@ type Blog struct {
 	Status                int8 /*0:draft, 1:release*/
 	Views                 int64
 	Created               time.Time `orm:"auto_now_add;type(datetime)"`
+	SnapShot              string
 }
 
 type RssFeeder struct {

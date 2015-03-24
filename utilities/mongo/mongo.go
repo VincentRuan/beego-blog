@@ -12,8 +12,8 @@ import (
 	"github.com/vincent3i/beego-blog/g"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
-	"os"
+	//"log"
+	//"os"
 	"strings"
 	"time"
 )
@@ -95,8 +95,8 @@ func Startup() error {
 		return err
 	}
 
-	mgo.SetDebug(false)
-	mgo.SetLogger(log.New(os.Stdout, "", log.LstdFlags))
+	//mgo.SetDebug(false)
+	//mgo.SetLogger(log.New(os.Stdout, "", log.LstdFlags))
 
 	beego.Debug("Mongo session startup completed!")
 	return nil

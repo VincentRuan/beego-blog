@@ -28,7 +28,7 @@ func InitEnv() {
 	logLevel := Cfg.String("log_level")
 	//log.SetLevelWithDefault(logLevel, "info")
 
-	beego.SetLogger("file", `{"filename":"D:/dm/log/beego_blog/blog.log"}`)
+	beego.SetLogger("file", fmt.Sprintf(`{"filename":"%s"}`, Cfg.String("log_file_path")))
 	beego.SetLevel(getLogLevel(logLevel))
 	beego.SetLogFuncCall(true)
 
