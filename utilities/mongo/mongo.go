@@ -265,6 +265,7 @@ func CollectionExists(sessionID string, mongoSession *mgo.Session, useDatabase s
 func ToString(queryMap interface{}) string {
 	json, err := json.Marshal(queryMap)
 	if err != nil {
+		beego.Error(err)
 		return ""
 	}
 

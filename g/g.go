@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/cache"
-	_ "github.com/astaxie/beego/cache/memcache"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/square/go-jose"
+	_ "github.com/vincent3i/beego-blog/cache"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -82,7 +82,7 @@ func initCache() {
 	cacheConfig := fmt.Sprintf(`{"conn":"%s"}`, Cfg.String("memcache_addresses"))
 	//注意memcache只能存储字符串，如需存储对象，需要先序列化
 	//序列化手段有encoding/gob,json ,bson, msgpack(性能最佳)
-	MemcachedCache, err = cache.NewCache("memcache", cacheConfig)
+	MemcachedCache, err = cache.NewCache("packmemcache", cacheConfig)
 	beego.BeeLogger.Debug("Loaded cache module with config %s.", cacheConfig)
 	if err != nil {
 		beego.Error("memcache init fail :(")
