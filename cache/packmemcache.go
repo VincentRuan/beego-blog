@@ -21,6 +21,9 @@ func NewPackMemCache() *PackMemcacheCache {
 
 // Unmarshal value from memcache.
 func Unmarshal(b interface{}, v interface{}) error {
+	if b == nil {
+		return nil
+	}
 	bs, ok := b.([]byte)
 	if ok {
 		return msgpack.Unmarshal(bs, v)
@@ -36,7 +39,7 @@ func (rc *PackMemcacheCache) Get(key string) interface{} {
 		}
 	}
 	if item, err := rc.conn.Get(key); err == nil {
-		return string(item.Value)
+		return item.Value
 	}
 	return nil
 }

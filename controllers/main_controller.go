@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/vincent3i/beego-blog/g"
+	"github.com/vincent3i/beego-blog/models"
 	"github.com/vincent3i/beego-blog/models/blog"
 	"github.com/vincent3i/beego-blog/models/catalog"
 )
@@ -27,8 +29,17 @@ func (this *MainController) Read() {
 		return
 	}
 
-	b.Views = b.Views + 1
-	blog.Update(b, "")
+	beego.BeeLogger.Debug("User read blog [%d] [%s]", b.Id, b.Title)
+
+	if vc := g.BlogViewCacheGet(b.Id); vc > 0 {
+		b.Views = vc + 1
+	} else {
+		b.Views = b.Views + 1
+	}
+	g.BlogViewCachePut(b.Id, b.Views)
+
+	//b.Views = b.Views + 1
+	//blog.Update(b, "")
 
 	this.Data["Blog"] = b
 	this.Data["Content"] = g.RenderMarkdown(blog.ReadBlogContent(b).Content)
@@ -53,13 +64,21 @@ func (this *MainController) ListByCatalog() {
 		return
 	}
 
-	ids := blog.Ids(c.Id)
-	pager := this.SetPaginator(limit, int64(len(ids)))
-	blogs := blog.ByCatalog(c.Id, pager.Offset(), limit)
+	if c.IsAuth && !this.IsAdmin {
+		beego.Debug("User can NOT access this page as verification is need!")
+		this.SetPaginator(10, 0)
+		this.Data["Catalog"] = c
+		this.Data["Blogs"] = make([]*models.Blog, 0, 0)
+		this.Data["PageTitle"] = c.Name
+	} else {
+		ids := blog.Ids(c.Id)
+		pager := this.SetPaginator(limit, int64(len(ids)))
+		blogs := blog.ByCatalog(c.Id, pager.Offset(), limit)
 
-	this.Data["Catalog"] = c
-	this.Data["Blogs"] = blogs
-	this.Data["PageTitle"] = c.Name
+		this.Data["Catalog"] = c
+		this.Data["Blogs"] = blogs
+		this.Data["PageTitle"] = c.Name
+	}
 
 	this.Layout = "layout/default.html"
 	this.TplNames = "article/by_catalog.html"

@@ -14,6 +14,7 @@ type Catalog struct {
 	Resume       string
 	DisplayOrder int
 	ImgUrl       string
+	IsAuth       bool `orm:"tinyint"`
 }
 
 type Blog struct {

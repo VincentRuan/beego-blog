@@ -31,14 +31,16 @@ func (this *LoginController) DoLogin() {
 
 	if ok := admin.CheckUser(name, password); ok {
 		beego.BeeLogger.Debug("User [%s] login success.", name)
+		this.Ctx.SetCookie("bb_name", name, 2592000, "/")
+		this.Ctx.ResponseWriter.Header().Add("Set-Cookie", "bb_password="+password+"; Max-Age=2592000; Path=/; httponly")
+
+		beego.BeeLogger.Debug("Put user name [%s] into session", name)
+		this.SetSession("username", name)
+		this.Ctx.WriteString("")
+	} else {
+		this.Ctx.WriteString("name or password is incorrect")
 	}
 
-	this.Ctx.SetCookie("bb_name", name, 2592000, "/")
-	this.Ctx.ResponseWriter.Header().Add("Set-Cookie", "bb_password="+password+"; Max-Age=2592000; Path=/; httponly")
-
-	beego.BeeLogger.Debug("Put user name [%s] into session", name)
-	this.SetSession("username", name)
-	this.Ctx.WriteString("")
 }
 
 func (this *LoginController) Logout() {

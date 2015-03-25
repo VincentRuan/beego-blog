@@ -32,13 +32,13 @@ func InitEnv() {
 	beego.SetLevel(getLogLevel(logLevel))
 	beego.SetLogFuncCall(true)
 
-	initCache()
+	initCfg()
 
 	LoadRSACipher()
-
 	registerDB()
 
-	initCfg()
+	initCache()
+
 }
 
 func getLogLevel(logLevel string) int {

@@ -208,6 +208,7 @@ func Del(b *Blog) error {
 
 	if num > 0 {
 		g.BlogCacheDel(fmt.Sprintf("article_ids_of_%d", b.CatalogId))
+		g.BlogViewCacheDel(b.Id)
 		BlogContents().Filter("Id", b.BlogContentId).Delete()
 	}
 
@@ -235,6 +236,15 @@ func Update(b *Blog, content string) error {
 	if err == nil {
 		g.BlogCacheDel(fmt.Sprintf("%d", b.Id))
 	}
+	return err
+}
+
+func UpdateView(b *Blog) error {
+	if b.Id == 0 {
+		return fmt.Errorf("primary key:id not set")
+	}
+
+	_, err := orm.NewOrm().Update(b, "views")
 	return err
 }
 
