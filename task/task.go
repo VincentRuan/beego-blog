@@ -86,6 +86,11 @@ func persistentBlogView() {
 			beego.BeeLogger.Debug("Push cache [%d] into DB[blog id [%d], view [%d]]", viewInCache, b.Id, b.Views)
 			b.Views = viewInCache
 			blog.UpdateView(&b)
+
+			if bg := g.BlogCacheGet(fmt.Sprintf("%d", b.Id)); bg != nil {
+				b1 := bg.(models.Blog)
+				b1.Views = b.Views
+			}
 		} else if viewInCache < b.Views {
 			g.BlogViewCachePut(b.Id, b.Views)
 		}

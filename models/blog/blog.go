@@ -190,7 +190,12 @@ func Save(this *Blog, blogContent string) (int64, error) {
 
 	//re, _ := regexp.Compile("\\s{2,}")
 	//this.SnapShot = re.ReplaceAllString(blogContent, "")[:300]
-	this.SnapShot = string([]rune(blogContent)[:300])
+	rn := []rune(blogContent)
+	if len(rn) > 300 {
+		this.SnapShot = string(rn[:300])
+	} else {
+		this.SnapShot = blogContent
+	}
 
 	id, err := or.Insert(this)
 	if err == nil {
