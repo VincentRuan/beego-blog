@@ -14,6 +14,7 @@ func (this *ArticleController) Draft() {
 	var blogs []*models.Blog
 	blog.Blogs().Filter("Status", 0).All(&blogs)
 	this.Data["Blogs"] = blogs
+	this.Data["IsDraft"] = true
 	this.Layout = "layout/admin.html"
 	this.TplNames = "article/draft.html"
 }
