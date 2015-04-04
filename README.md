@@ -19,5 +19,5 @@ bee run
 ```
 url: /me
 username: vincent
-password: a
+password: **********
 ```
