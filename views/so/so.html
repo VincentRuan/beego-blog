@@ -1,0 +1,127 @@
+<link rel="stylesheet" type="text/css" href="/static/css/font-awesome.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/lib.min.css"/>
+<link rel="stylesheet" type="text/css" href="/static/css/plugins/bootstrap/bootstrap-dialog.css">
+<script type="text/javascript" src="/static/javascript/plugins/bootstrap/bootstrap-dialog.js"></script>
+<script type="text/javascript" src="/static/javascript/jquery-dateFormat.js"></script>
+<!--<form role="form" action="/so" method="post">-->
+<div class="row form-group">
+<!--
+    <div class="col-xs-9">
+        <input type="text" class="form-control" placeholder="duang~~" name="q">
+    </div>
+    <div class="col-xs-3">
+        <button type="submit" class="btn btn-primary">搜索一下</button>
+    </div>
+	
+	<div class="input-group">
+        <input type="text" class="form-control">
+        <span class="input-group-addon">搜索一下</span>
+    </div>
+	-->
+	<div class="col-lg-12">
+        <div class="input-group">
+            <input type="text" class="form-control" id="query" placeholder="duang~~"/>
+            <span class="input-group-btn">
+                <button id="btn1" class="btn btn-default" type="button" data-loading-text="Loading...">Go!</button>
+				<!--<input id="btn1" type="submit" class="btn btn-default" type="submit" value="Go!" data-loading-text="Loading..."/>-->
+            </span>
+			<!--<button id="btn1" type="button" class="btn btn-primary" data-loading-text="Loading...">提交</button>-->
+        </div><!-- /input-group -->
+    </div><!-- /.col-lg-6 -->
+</div>
+<div class="entry-list" id="blog-list">
+<!--
+<div class="item" itemtype="http://schema.org/Article">
+    <h2 class="entry-title" itemprop="name">
+        <a href="/article/.Ident" itemprop="url" style="text-decoration: none;">
+		if eq .Type 0[原创]end
+		if eq .Type 1[翻译]end
+		if eq .Type 2[转载]end
+			.Title
+		</a>
+    </h2>
+    <div class="entry-views">.Views</div>
+
+    <div class="entry-meta">
+      <span>发表于：dateformat .Created "2006-01-02 15:04:05"</span>
+    </div>
+    <a class="entry-snippet" itemprop="description" href="/article/.Ident">
+      .SnapShot...
+    </a>
+  </div>-->
+
+</div>
+<!--</form>-->
+<script type="text/javascript">	
+	$(function (){
+		
+		//绑定搜索框回车事件
+		$("#query").bind('keydown', function(e) {
+			if(e.which == 13) {
+				//回车
+				e.preventDefault()
+				if(!$('#btn1').is(":disabled")) {
+					$('#btn1').click()
+				}
+			}
+		});
+		
+		$('#btn1').click(function() {
+			$(this).button('loading')
+			
+			$.post('{{urlfor "MainController.DoQuery"}}', {"q" : $(":text#query").val()}, function(data, textStatus) {
+				//console.log("status---" + textStatus)
+				//console.log(data)
+				$('#blog-list').empty()
+				$.each(data, function(i, n) {
+					console.log(n)
+					var $div = $('<div class="item" itemtype="http://schema.org/Article"></div>');
+					
+					var $h2 = $('<h2 class="entry-title" itemprop="name"></h2>');
+					
+					var $a = $('<a itemprop="url" style="text-decoration: none;"></a>');
+					$a.attr("href", "/article/" + n.Ident)
+					$a.text(getBlogType(n.Type) + n.Title);
+					$h2.append($a);
+					$div.append($h2);
+					
+					var $subdiv = $('<div class="entry-views"></div>');
+					$subdiv.text(n.Views);
+					$div.append($subdiv);
+					
+					$subdiv = $('<div class="entry-meta"></div>');
+					var $span = $('<span></span>')
+					$span.text('发表于：' + $.format.prettyDate(n.Created))
+					$subdiv.append($span);
+					$div.append($subdiv);
+					
+					$a = $('<a class="entry-snippet" itemprop="description"></a>');
+					$a.attr("href", "/article/" + n.Ident)
+					$a.text(n.SnapShot + "...");
+					$div.append($a);
+					
+					$('#blog-list').append($div)
+				});
+				
+				$('#btn1').button('reset')
+			}, "json");
+		});
+		
+		//$('#btn1').button('loading')
+		//$('#btn1').button('toggle').button('reset')
+		
+	});
+	
+	function getBlogType(blogType) {
+		switch(blogType) {
+			case 0 :
+			return '[原创]';
+			case 1:
+			return '[翻译]';
+			case 2:
+			return '[转载]';
+			default:
+			return '';
+		}
+	}
+</script>

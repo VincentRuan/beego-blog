@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/vincent3i/beego-blog/engine"
 	"github.com/vincent3i/beego-blog/g"
 	"github.com/vincent3i/beego-blog/models"
 	"github.com/vincent3i/beego-blog/models/blog"
 	"github.com/vincent3i/beego-blog/models/catalog"
+	"time"
 )
 
 type MainController struct {
@@ -29,6 +31,10 @@ func (this *MainController) Read() {
 		return
 	}
 
+	if !this.IsAdmin && blog.IsAuth(b.Id) {
+		this.Ctx.WriteString("You do not have permission!")
+	}
+
 	beego.BeeLogger.Debug("User read blog [%d] [%s]", b.Id, b.Title)
 
 	if vc := g.BlogViewCacheGet(b.Id); vc > 0 {
@@ -42,7 +48,19 @@ func (this *MainController) Read() {
 	//blog.Update(b, "")
 
 	this.Data["Blog"] = b
-	this.Data["Content"] = g.RenderMarkdown(blog.ReadBlogContent(b).Content)
+
+	beginT := time.Now()
+	if content := g.BlogContentCacheGet(b.Id); content != "" {
+		beego.Debug("Get blog content by cache in ", time.Since(beginT))
+		this.Data["Content"] = content
+	} else {
+		beginT = time.Now()
+		content = g.RenderMarkdown(blog.ReadBlogContent(b).Content)
+		beego.Debug("Get blog content by render in ", time.Since(beginT))
+		g.BlogContentCachePut(b.Id, content)
+		this.Data["Content"] = content
+	}
+	//this.Data["Content"] = g.RenderMarkdown(blog.ReadBlogContent(b).Content)
 	this.Data["PageTitle"] = b.Title
 	this.Data["Catalog"] = catalog.OneById(b.CatalogId)
 	this.Layout = "layout/default.html"
@@ -82,4 +100,27 @@ func (this *MainController) ListByCatalog() {
 
 	this.Layout = "layout/default.html"
 	this.TplNames = "article/by_catalog.html"
+}
+
+func (this *MainController) Query() {
+	this.Data["PageTitle"] = "搜索博客"
+	this.Data["BlogTitle"] = "Vincent"
+	this.Layout = "layout/default.html"
+	this.TplNames = "so/so.html"
+}
+
+func (this *MainController) DoQuery() {
+	query := this.GetString("q")
+	beego.BeeLogger.Debug("Search [%s]", query)
+
+	var result []models.Blog
+	if query != "" {
+		result = engine.SearchResult(query, this.IsAdmin)
+	} else {
+		result = make([]models.Blog, 0)
+	}
+	beego.BeeLogger.Debug("查询结果 %d 条", len(result))
+	this.Data["json"] = result
+
+	this.ServeJson()
 }

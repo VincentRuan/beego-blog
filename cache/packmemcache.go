@@ -19,18 +19,6 @@ func NewPackMemCache() *PackMemcacheCache {
 	return &PackMemcacheCache{}
 }
 
-// Unmarshal value from memcache.
-func Unmarshal(b interface{}, v interface{}) error {
-	if b == nil {
-		return nil
-	}
-	bs, ok := b.([]byte)
-	if ok {
-		return msgpack.Unmarshal(bs, v)
-	}
-	return errors.New("b must be byte array!")
-}
-
 // get value from memcache.
 func (rc *PackMemcacheCache) Get(key string) interface{} {
 	if rc.conn == nil {

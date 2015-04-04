@@ -29,7 +29,7 @@ type Job interface {
 
 func InitTasks() {
 	filePath := fmt.Sprintf("%s/conf/%s", beego.AppPath, "task.json")
-	beego.BeeLogger.Debug("Init scheduler with configuration file %s...", filePath)
+	beego.BeeLogger.Debug("Init schedulers with configuration file [%s]...", filePath)
 
 	b, err := ioutil.ReadFile(filePath)
 	if nil != err {
@@ -58,7 +58,7 @@ func InitTasks() {
 	c.Start()
 
 	c = cron.New()
-	c.AddFunc("0/20 * * * * *", persistentBlogView)
+	c.AddFunc("0 0/1 * * * *", persistentBlogView)
 	c.Start()
 }
 
@@ -83,13 +83,15 @@ func persistentBlogView() {
 	for _, b := range blogs {
 		viewInCache = g.BlogViewCacheGet(b.Id)
 		if viewInCache > b.Views {
-			beego.BeeLogger.Debug("Push cache [%d] into DB[blog id [%d], view [%d]]", viewInCache, b.Id, b.Views)
+			beego.BeeLogger.Debug("Push cache [%d] into DB[ - blog id [%d], view [%d] - ]", viewInCache, b.Id, b.Views)
 			b.Views = viewInCache
 			blog.UpdateView(&b)
 
 			if bg := g.BlogCacheGet(fmt.Sprintf("%d", b.Id)); bg != nil {
 				b1 := bg.(models.Blog)
 				b1.Views = b.Views
+
+				g.BlogCachePut(fmt.Sprintf("%d", b.Id), b1)
 			}
 		} else if viewInCache < b.Views {
 			g.BlogViewCachePut(b.Id, b.Views)

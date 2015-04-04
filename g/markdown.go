@@ -5,6 +5,7 @@ import (
 )
 
 func RenderMarkdown(mdStr string) string {
+
 	htmlFlags := 0
 	htmlFlags |= blackfriday.HTML_USE_XHTML
 	// htmlFlags |= blackfriday.HTML_USE_SMARTYPANTS

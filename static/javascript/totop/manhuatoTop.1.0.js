@@ -14,6 +14,7 @@ $(function() {
 		var $toTop = $(this);
 		var $top = $("#totop");
 		var $ta = $("#totop a");
+		$ta.css("box-sizing", "content-box")
 		$toTop.scroll(function(){
 			var scrolltop=$(this).scrollTop();		
 			if(scrolltop>=options.showHeight){				

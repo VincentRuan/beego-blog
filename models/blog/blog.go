@@ -2,6 +2,7 @@ package blog
 
 import (
 	"fmt"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/ulricqin/goutils/strtool"
 	"github.com/vincent3i/beego-blog/g"
@@ -214,6 +215,7 @@ func Del(b *Blog) error {
 	if num > 0 {
 		g.BlogCacheDel(fmt.Sprintf("article_ids_of_%d", b.CatalogId))
 		g.BlogViewCacheDel(b.Id)
+		g.BlogContentCacheDel(b.Id)
 		BlogContents().Filter("Id", b.BlogContentId).Delete()
 	}
 
@@ -232,9 +234,15 @@ func Update(b *Blog, content string) error {
 		if e != nil {
 			return e
 		}
+
 		b.BlogContentLastUpdate = time.Now().Unix()
 
 		b.SnapShot = string([]rune(content)[:300])
+
+		e = g.BlogContentCachePut(b.Id, g.RenderMarkdown(content))
+		if e != nil {
+			beego.Error(e)
+		}
 	}
 
 	_, err := orm.NewOrm().Update(b)
@@ -271,6 +279,18 @@ func compareContent(origContent, targetContent string) bool {
 
 func Blogs() orm.QuerySeter {
 	return orm.NewOrm().QueryTable(new(Blog))
+}
+
+func IsAuth(bid int64) bool {
+	var isAuth bool
+	err := orm.NewOrm().Raw("select c.is_auth from bb_blog b join bb_catalog c on (b.catalog_id=c.id) where b.id=?", bid).QueryRow(&isAuth)
+	if err != nil {
+		beego.Error(err)
+		return false
+	}
+	beego.Debug(isAuth)
+
+	return isAuth
 }
 
 func BlogContents() orm.QuerySeter {

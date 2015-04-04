@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	blogPrefix     = "blog_"
-	catalogPrefix  = "catalog_"
-	blogViewPrefix = "blog_view_"
+	blogPrefix        = "blog_"
+	catalogPrefix     = "catalog_"
+	blogViewPrefix    = "blog_view_"
+	blogContentPrefix = "blog_content_"
 )
 
 func BlogCachePut(key string, val interface{}) error {
@@ -51,4 +52,21 @@ func BlogViewCacheGet(key int64) int64 {
 
 func BlogViewCachePut(key int64, val interface{}) error {
 	return MemcachedCache.Put(fmt.Sprintf("%s%d", blogViewPrefix, key), val, 0)
+}
+
+func BlogContentCacheGet(key int64) string {
+	var content string
+	if err := cache.Unmarshal(MemcachedCache.Get(fmt.Sprintf("%s%d", blogContentPrefix, key)), &content); err != nil {
+		beego.Error(err)
+		return ""
+	}
+	return content
+}
+
+func BlogContentCachePut(key int64, val interface{}) error {
+	return MemcachedCache.Put(fmt.Sprintf("%s%d", blogContentPrefix, key), val, 0)
+}
+
+func BlogContentCacheDel(key int64) error {
+	return MemcachedCache.Delete(fmt.Sprintf("%s%d", blogContentPrefix, key))
 }
