@@ -288,7 +288,6 @@ func IsAuth(bid int64) bool {
 		beego.Error(err)
 		return false
 	}
-	beego.Debug(isAuth)
 
 	return isAuth
 }
