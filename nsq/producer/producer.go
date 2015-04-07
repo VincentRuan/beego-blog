@@ -1,66 +1,62 @@
 package producer
 
 import (
-	"encoding/json"
-	"log"
-
+	"errors"
+	"github.com/astaxie/beego"
 	"github.com/bitly/go-nsq"
-	"github.com/crackcomm/nsqueue/nsqlog"
+	"github.com/vincent3i/beego-blog/g"
+	"gopkg.in/vmihailenco/msgpack.v2"
 )
 
-// Producer inherets the nsq Producer object
-type Producer struct {
-	Logger   *log.Logger
-	LogLevel *nsq.LogLevel
+var producer *nsq.Producer
 
-	*nsq.Producer
-}
+func InitNSQProducer() error {
+	if g.NSQAddr == "" {
+		return errors.New("Unable to read NSQ address from config file!")
+	}
 
-// New - Creates a new Producer.
-func New() *Producer {
-	return new(Producer)
-}
-
-// Connect method initialize the connection to nsq
-func (p *Producer) Connect(addr string) (err error) {
-	return p.ConnectConfig(addr, nsq.NewConfig())
-}
-
-// ConnectConfig method initialize the connection to nsq with config.
-func (p *Producer) ConnectConfig(addr string, config *nsq.Config) (err error) {
-	p.Producer, err = nsq.NewProducer(addr, config)
-	p.Producer.SetLogger(p.logger(), p.loglevel())
-	return
-}
-
-// PublishJSONAsync - sends message to nsq  topic in json format asynchronously
-func (p *Producer) PublishJSONAsync(topic string, v interface{}, doneChan chan *nsq.ProducerTransaction, args ...interface{}) error {
-	body, err := json.Marshal(v)
+	var err error
+	producer, err = nsq.NewProducer(g.NSQAddr, nsq.NewConfig())
 	if err != nil {
 		return err
 	}
-	return p.PublishAsync(topic, body, doneChan, args...)
+	producer.SetLogger(beego.BeeLogger, nsq.LogLevelDebug)
+
+	return nil
 }
 
-// PublishJSON - sends message to nsq  topic in json format
-func (p *Producer) PublishJSON(topic string, v interface{}) error {
-	body, err := json.Marshal(v)
+func PublishMsg(topic string, v ...interface{}) error {
+	var body []byte
+	var err error
+	if len(v) == 1 {
+		body, err = encode(v[0])
+		if err != nil {
+			return err
+		}
+		return producer.PublishAsync(topic, body, nil)
+	}
+
+	bodies := make([][]byte, len(v))
+	for i, vv := range v {
+		body, err = encode(vv)
+		if err != nil {
+			beego.Error(err)
+			continue
+		}
+		bodies[i] = body
+	}
+
+	return producer.MultiPublishAsync(topic, bodies, nil)
+}
+
+func encode(v interface{}) ([]byte, error) {
+	if b, ok := v.([]byte); ok {
+		return b, nil
+	}
+
+	body, err := msgpack.Marshal(v)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return p.Publish(topic, body)
-}
-
-func (p *Producer) logger() *log.Logger {
-	if p.Logger == nil {
-		return nsqlog.Logger
-	}
-	return p.Logger
-}
-
-func (p *Producer) loglevel() nsq.LogLevel {
-	if p.LogLevel == nil {
-		return nsqlog.LogLevel
-	}
-	return *p.LogLevel
+	return body, nil
 }

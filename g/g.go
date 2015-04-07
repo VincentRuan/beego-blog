@@ -99,7 +99,7 @@ func LoadRSACipher() {
 	privateCipherPath := Cfg.String("private_cipher_path")
 	publicCipherPath := Cfg.String("public_cipher_path")
 	if privateCipherPath == "" || publicCipherPath == "" {
-		beego.Informational("Unale to found private_cipher_path or public_cipher_path from app.cnf :(")
+		beego.Error("Unale to found private_cipher_path or public_cipher_path from app.cnf :(")
 		beego.BeeLogger.Flush()
 		os.Exit(1)
 	}

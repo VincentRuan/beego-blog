@@ -18,6 +18,7 @@ var (
 	IsQiniuPublicAccess    bool = true
 	QiniuCatalogUploadPath string
 	LocalCatalogUploadPath string
+	NSQAddr                string
 )
 
 func initCfg() {
@@ -46,4 +47,5 @@ func initCfg() {
 	re, _ := regexp.Compile(`\\+`)
 	LocalCatalogUploadPath = re.ReplaceAllString(Cfg.String("local_catalog_upload_path"), "/")
 
+	NSQAddr = Cfg.String("nsq_address")
 }

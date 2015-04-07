@@ -124,3 +124,26 @@ func (this *MainController) DoQuery() {
 
 	this.ServeJson()
 }
+
+func (this *MainController) ElasticQuery() {
+	this.Data["PageTitle"] = "搜索博客"
+	this.Data["BlogTitle"] = "Vincent"
+	this.Layout = "layout/default.html"
+	this.TplNames = "so/query.html"
+}
+
+func (this *MainController) DoElasticQuery() {
+	query := this.GetString("q")
+	beego.BeeLogger.Debug("Search [%s]", query)
+
+	var result []models.Blog
+	if query != "" {
+		result = engine.ElasticSearch(query, this.IsAdmin)
+	} else {
+		result = make([]models.Blog, 0)
+	}
+	beego.BeeLogger.Debug("查询结果 %d 条", len(result))
+	this.Data["json"] = result
+
+	this.ServeJson()
+}

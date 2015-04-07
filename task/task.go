@@ -27,14 +27,14 @@ type Job interface {
 	doInterval(a ...interface{}) bool
 }
 
-func InitTasks() {
+func InitTasks() error {
 	filePath := fmt.Sprintf("%s/conf/%s", beego.AppPath, "task.json")
 	beego.BeeLogger.Debug("Init schedulers with configuration file [%s]...", filePath)
 
 	b, err := ioutil.ReadFile(filePath)
 	if nil != err {
 		beego.BeeLogger.Error("Unable to open/read file ---- [%s]", filePath)
-		return
+		return err
 	}
 
 	var taskSlice TaskSlice
@@ -60,6 +60,8 @@ func InitTasks() {
 	c = cron.New()
 	c.AddFunc("0 0/1 * * * *", persistentBlogView)
 	c.Start()
+
+	return nil
 }
 
 func p() {

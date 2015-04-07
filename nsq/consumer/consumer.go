@@ -1,116 +1,81 @@
 package consumer
 
 import (
-	"log"
-
+	"errors"
+	"github.com/astaxie/beego"
 	"github.com/bitly/go-nsq"
-	"github.com/crackcomm/nsqueue/nsqlog"
+	"github.com/vincent3i/beego-blog/engine"
+	"github.com/vincent3i/beego-blog/g"
+	"github.com/vincent3i/beego-blog/models"
+	"github.com/vincent3i/beego-blog/models/blog"
+	"gopkg.in/vmihailenco/msgpack.v2"
+	"strconv"
 )
 
-type topicChan struct {
-	topic   string
-	channel string
+type Handler func(*nsq.Message)
+
+type queue struct {
+	callback Handler
+	*nsq.Consumer
 }
 
-// Consumer - NSQ messages consumer.
-type Consumer struct {
-	Logger   *log.Logger
-	LogLevel *nsq.LogLevel
-
-	handlers map[topicChan]*queue
+func (q *queue) HandleMessage(message *nsq.Message) error {
+	q.callback(message)
+	return nil
 }
 
-// New - Creates a new consumer structure
-func New() *Consumer {
-	return &Consumer{
-		handlers: make(map[topicChan]*queue),
+func InitNSQCunsumer() error {
+	if g.NSQAddr == "" {
+		return errors.New("Unable to read NSQ address from config file!")
 	}
-}
 
-// Register - Registers topic/channel handler for messages
-// This function creates a new nsq.Reader
-func (c *Consumer) Register(topic, channel string, maxInFlight int, handler Handler) error {
-	tch := topicChan{topic, channel}
-
-	config := nsq.NewConfig()
-	config.Set("verbose", true)
-	config.Set("max_in_flight", maxInFlight)
-
-	r, err := nsq.NewConsumer(topic, channel, config)
+	err := initBlogConsumer()
 	if err != nil {
 		return err
 	}
 
-	r.SetLogger(c.logger(), c.loglevel())
-
-	q := &queue{handler, r}
-	r.AddConcurrentHandlers(q, maxInFlight)
-	c.handlers[tch] = q
 	return nil
 }
 
-// ConnectLookupd - Connects all readers to NSQ lookupd
-func (c *Consumer) ConnectLookupd(addr string) error {
-	for _, q := range c.handlers {
-		if err := q.ConnectToNSQLookupd(addr); err != nil {
-			return err
-		}
+func initBlogConsumer() error {
+	c, err := nsq.NewConsumer("elastic-blog", "blog-chan", nsq.NewConfig())
+	if err != nil {
+		return err
 	}
+	c.SetLogger(beego.BeeLogger, nsq.LogLevelDebug)
+
+	//add handler
+	q := &queue{HandleElasticBlogs, c}
+	c.AddHandler(q)
+
+	err = c.ConnectToNSQD(g.NSQAddr)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-// ConnectLookupdList - Connects all readers to NSQ lookupd instances
-func (c *Consumer) ConnectLookupdList(addrs []string) error {
-	for _, addr := range addrs {
-		if err := c.ConnectLookupd(addr); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Connect - Connects all readers to NSQ
-func (c *Consumer) Connect(addr string) error {
-	for _, q := range c.handlers {
-		if err := q.ConnectToNSQD(addr); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// ConnectList - Connects all readers to NSQ instances
-func (c *Consumer) ConnectList(addrs []string) error {
-	for _, addr := range addrs {
-		if err := c.Connect(addr); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Start - Just waits
-func (c *Consumer) Start(debug bool) error {
-	if debug {
-		for i := range c.handlers {
-			log.Printf("Handler: topic=%s channel=%s\n", i.topic, i.channel)
-		}
+func HandleElasticBlogs(msg *nsq.Message) {
+	bb := models.Blog{}
+	err := msgpack.Unmarshal(msg.Body, &bb)
+	if err != nil {
+		beego.Error(err)
+		return
 	}
 
-	<-make(chan bool)
-
-	return nil
-}
-func (c *Consumer) logger() *log.Logger {
-	if c.Logger == nil {
-		return nsqlog.Logger
+	elasticBlog := engine.ElasticBlog{strconv.FormatInt(bb.Id, 10), bb.Title + blog.ReadBlogContent(&bb).Content}
+	put, err := engine.Client.Index().
+		Index(engine.Blog_Index_Name).
+		Type("blog").
+		Id(elasticBlog.Id).
+		BodyJson(elasticBlog).
+		Do()
+	if err != nil {
+		beego.Error(err)
+		return
 	}
-	return c.Logger
-}
-
-func (c *Consumer) loglevel() nsq.LogLevel {
-	if c.LogLevel == nil {
-		return nsqlog.LogLevel
-	}
-	return *c.LogLevel
+	beego.BeeLogger.Debug("Indexed blog %s to index %s, type %s", put.Id, put.Index, put.Type)
+	//eat message
+	msg.Finish()
 }

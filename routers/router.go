@@ -26,6 +26,7 @@ func init() {
 	beego.Router("/me/article/draft", &controllers.ArticleController{}, "get:Draft")
 
 	beego.Router("/so", &controllers.MainController{}, "get:Query;post:DoQuery")
+	beego.Router("/q", &controllers.MainController{}, "get:ElasticQuery;post:DoElasticQuery")
 	beego.Router("/shutdown", &controllers.MeController{}, "get:ShutDown")
 
 	beego.Router("/me/rss", &controllers.RSSController{}, "get:LoadPage")

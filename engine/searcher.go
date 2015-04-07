@@ -75,7 +75,7 @@ func (criteria BlogScoringCriteria) Score(doc types.IndexedDocument, fields inte
 }
 
 /*******************************************************************************
-JSON-RPC
+search
 *******************************************************************************/
 func SearchResult(query string, isAdmin bool) []models.Blog {
 	output := searcher.Search(types.SearchRequest{
@@ -136,5 +136,6 @@ func InitSearcher() error {
 
 func CloseSearcher() {
 	searcher.Close()
+	Client.Stop()
 	beego.Debug("Closed searcher......")
 }
