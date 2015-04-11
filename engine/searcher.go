@@ -136,6 +136,6 @@ func InitSearcher() error {
 
 func CloseSearcher() {
 	searcher.Close()
-	Client.Stop()
+	ElasticClient.Stop()
 	beego.Debug("Closed searcher......")
 }

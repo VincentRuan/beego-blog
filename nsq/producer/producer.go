@@ -20,7 +20,7 @@ func InitNSQProducer() error {
 	if err != nil {
 		return err
 	}
-	producer.SetLogger(beego.BeeLogger, nsq.LogLevelDebug)
+	producer.SetLogger(beego.BeeLogger, nsq.LogLevelInfo)
 
 	return nil
 }

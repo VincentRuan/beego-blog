@@ -13,12 +13,12 @@ import (
 )
 
 func main() {
-	g.InitEnv()
+	beego.AddAPPStartHook(g.InitEnv)
 	beego.AddAPPStartHook(mongo.Startup)
 	beego.AddAPPStartHook(task.InitTasks)
 	beego.AddAPPStartHook(consumer.InitNSQCunsumer)
 	beego.AddAPPStartHook(producer.InitNSQProducer)
-	beego.AddAPPStartHook(engine.InitSearcher)
 	beego.AddAPPStartHook(engine.InitElasticSearch)
+	beego.AddAPPStartHook(engine.InitSearcher)
 	beego.Run()
 }

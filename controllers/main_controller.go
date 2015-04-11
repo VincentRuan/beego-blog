@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/vincent3i/beego-blog/engine"
 	"github.com/vincent3i/beego-blog/g"
@@ -37,12 +38,13 @@ func (this *MainController) Read() {
 
 	beego.BeeLogger.Debug("User read blog [%d] [%s]", b.Id, b.Title)
 
-	if vc := g.BlogViewCacheGet(b.Id); vc > 0 {
-		b.Views = vc + 1
-	} else {
-		b.Views = b.Views + 1
+	//in here blog cache must be set
+	if bg := g.BlogCacheGet(fmt.Sprintf("%d", b.Id)); bg != nil {
+		b1 := bg.(models.Blog)
+		b1.Views = b1.Views + 1
+
+		g.BlogCachePut(fmt.Sprintf("%d", b.Id), b1)
 	}
-	g.BlogViewCachePut(b.Id, b.Views)
 
 	//b.Views = b.Views + 1
 	//blog.Update(b, "")

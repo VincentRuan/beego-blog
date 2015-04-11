@@ -93,7 +93,7 @@ func Startup() error {
 		return err
 	}
 
-	mgo.SetDebug(true)
+	mgo.SetDebug(false)
 	//mgo.SetLogger(log.New(os.Stdout, "", log.LstdFlags))
 	mgo.SetLogger(beego.BeeLogger)
 

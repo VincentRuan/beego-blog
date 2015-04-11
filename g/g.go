@@ -10,7 +10,6 @@ import (
 	"github.com/square/go-jose"
 	_ "github.com/vincent3i/beego-blog/cache"
 	"io/ioutil"
-	"os"
 	"strings"
 )
 
@@ -23,7 +22,8 @@ var Cfg = beego.AppConfig
 var RSAPrivateKey *rsa.PrivateKey
 var RSAPublicKey *rsa.PublicKey
 
-func InitEnv() {
+func InitEnv() error {
+	//beego.Debug("Oracle123 ---->>> ", Encrypt("Oracle123"))
 	// log
 	logLevel := Cfg.String("log_level")
 	//log.SetLevelWithDefault(logLevel, "info")
@@ -34,11 +34,22 @@ func InitEnv() {
 
 	initCfg()
 
-	LoadRSACipher()
-	registerDB()
+	err := LoadRSACipher()
+	if err != nil {
+		return err
+	}
 
-	initCache()
+	err = registerDB()
+	if err != nil {
+		return err
+	}
 
+	err = initCache()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func getLogLevel(logLevel string) int {
@@ -69,14 +80,14 @@ func getLogLevel(logLevel string) int {
 	return logLvl
 }
 
-func initCache() {
+func initCache() error {
 	// cache
 	var err error
 	Cache, err = cache.NewCache("memory", `{"interval":60}`)
 	if err != nil {
 		beego.Error("cache init fail :(")
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("cache init fail :(")
 	}
 
 	cacheConfig := fmt.Sprintf(`{"conn":"%s"}`, Cfg.String("memcache_addresses"))
@@ -87,21 +98,22 @@ func initCache() {
 	if err != nil {
 		beego.Error("memcache init fail :(")
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("memcache init fail :(")
 	}
 	//设置缓存项的到期时间
 	blogCacheExpire, _ = Cfg.Int64("blog_cache_expire")
 	catalogCacheExpire, _ = Cfg.Int64("catalog_cache_expire")
+	return nil
 }
 
 //加载RSA密钥/公钥
-func LoadRSACipher() {
+func LoadRSACipher() error {
 	privateCipherPath := Cfg.String("private_cipher_path")
 	publicCipherPath := Cfg.String("public_cipher_path")
 	if privateCipherPath == "" || publicCipherPath == "" {
 		beego.Error("Unale to found private_cipher_path or public_cipher_path from app.cnf :(")
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("Unale to found private_cipher_path or public_cipher_path from app.cnf :(")
 	}
 
 	//读取私钥
@@ -109,8 +121,9 @@ func LoadRSACipher() {
 	if err != nil {
 		beego.BeeLogger.Error("Unale to read file [%s] :(", privateCipherPath)
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("Unale to read file [%s] :(", privateCipherPath)
 	}
+
 	privateKey, err := jose.LoadPrivateKey(fileBytes)
 	switch privateKey.(type) {
 	case *rsa.PrivateKey:
@@ -119,7 +132,7 @@ func LoadRSACipher() {
 	default:
 		beego.BeeLogger.Error("Key from [%s] is not a valid private key for RSA :(", privateCipherPath)
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("Key from [%s] is not a valid private key for RSA :(", privateCipherPath)
 	}
 
 	//读取公钥
@@ -127,7 +140,7 @@ func LoadRSACipher() {
 	if err != nil {
 		beego.BeeLogger.Error("Unale to read file [%s] :(", publicCipherPath)
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("Unale to read file [%s] :(", publicCipherPath)
 	}
 	publicKey, err := jose.LoadPublicKey(fileBytes)
 	switch publicKey.(type) {
@@ -137,10 +150,11 @@ func LoadRSACipher() {
 	default:
 		beego.BeeLogger.Error("Key from [%s] is not a valid public key for RSA :(", publicCipherPath)
 		beego.BeeLogger.Flush()
-		os.Exit(1)
+		return fmt.Errorf("Key from [%s] is not a valid public key for RSA :(", publicCipherPath)
 	}
 
 	beego.Debug("Load RSA private and public cipher from app.cnf completed!")
+	return nil
 }
 
 func Encrypt(plaintext string) string {
@@ -190,7 +204,7 @@ func Decrypt(serialized string) string {
 	return string(decrypted)
 }
 
-func registerDB() {
+func registerDB() error {
 	// database
 	dbUser := Cfg.String("db_user")
 	dbPass := Cfg.String("db_pass")
@@ -207,10 +221,12 @@ func registerDB() {
 	err := orm.RegisterDataBase("default", "mysql", dbLink, maxIdleConn, maxOpenConn)
 	if nil != err {
 		beego.Error(err.Error())
+		return err
 	}
 
 	RunMode = Cfg.String("runmode")
 	if RunMode == "dev" {
 		orm.Debug = true
 	}
+	return nil
 }

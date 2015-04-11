@@ -42,7 +42,7 @@ func initBlogConsumer() error {
 	if err != nil {
 		return err
 	}
-	c.SetLogger(beego.BeeLogger, nsq.LogLevelDebug)
+	c.SetLogger(beego.BeeLogger, nsq.LogLevelInfo)
 
 	//add handler
 	q := &queue{HandleElasticBlogs, c}
@@ -65,7 +65,7 @@ func HandleElasticBlogs(msg *nsq.Message) {
 	}
 
 	elasticBlog := engine.ElasticBlog{strconv.FormatInt(bb.Id, 10), bb.Title + blog.ReadBlogContent(&bb).Content}
-	put, err := engine.Client.Index().
+	put, err := engine.ElasticClient.Index().
 		Index(engine.Blog_Index_Name).
 		Type("blog").
 		Id(elasticBlog.Id).

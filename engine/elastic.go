@@ -13,7 +13,7 @@ import (
 const Blog_Index_Name = "ik_g_blogs"
 
 var (
-	Client *elastic.Client
+	ElasticClient *elastic.Client
 )
 
 type ElasticBlog struct {
@@ -26,7 +26,7 @@ func InitElasticSearch() error {
 	// Obtain a client and connect to the default Elasticsearch installation
 	// on 127.0.0.1:9200. Of course you can configure your client to connect
 	// to other hosts and configure it in various other ways.
-	Client, err = elastic.NewClient(
+	ElasticClient, err = elastic.NewClient(
 		elastic.SetURL("http://localhost:9200"),
 	)
 	if err != nil {
@@ -34,7 +34,7 @@ func InitElasticSearch() error {
 	}
 
 	// Ping the Elasticsearch server to get e.g. the version number
-	info, code, err := Client.Ping().Do()
+	info, code, err := ElasticClient.Ping().Do()
 	if err != nil {
 		// Handle error
 		return err
@@ -42,14 +42,14 @@ func InitElasticSearch() error {
 	beego.BeeLogger.Debug("Elasticsearch returned with code [%d] and version [%s]", code, info.Version.Number)
 
 	// Use the IndexExists service to check if a specified index exists.
-	exists, err := Client.IndexExists(Blog_Index_Name).Do()
+	exists, err := ElasticClient.IndexExists(Blog_Index_Name).Do()
 	if err != nil {
 		// Handle error
 		return err
 	}
 	if !exists {
 		// Create a new index.
-		createIndex, err := Client.CreateIndex(Blog_Index_Name).Do()
+		createIndex, err := ElasticClient.CreateIndex(Blog_Index_Name).Do()
 		if err != nil {
 			// Handle error
 			return err
@@ -72,7 +72,7 @@ func InitElasticSearch() error {
 	producer.PublishMsg("elastic-blog", vv...)
 
 	// Flush to make sure the documents got written.
-	_, err = Client.Flush().Index(Blog_Index_Name).Do()
+	_, err = ElasticClient.Flush().Index(Blog_Index_Name).Do()
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func ElasticSearch(query string, isAdmin bool) []models.Blog {
 	docs := []models.Blog{}
 
 	termQuery := elastic.NewTermQuery("content", query)
-	searchResult, err := Client.Search().
+	searchResult, err := ElasticClient.Search().
 		Index(Blog_Index_Name). // search in index "twitter"
 		Query(&termQuery).      // specify the query
 		Sort("content", false). // sort by "user" field, ascending

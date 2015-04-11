@@ -214,7 +214,6 @@ func Del(b *Blog) error {
 
 	if num > 0 {
 		g.BlogCacheDel(fmt.Sprintf("article_ids_of_%d", b.CatalogId))
-		g.BlogViewCacheDel(b.Id)
 		g.BlogContentCacheDel(b.Id)
 		BlogContents().Filter("Id", b.BlogContentId).Delete()
 	}
@@ -245,6 +244,12 @@ func Update(b *Blog, content string) error {
 		}
 	}
 
+	if bg := g.BlogCacheGet(fmt.Sprintf("%d", b.Id)); bg != nil {
+		if b1, ok := bg.(Blog); ok && b1.Views > b.Views {
+			beego.BeeLogger.Debug("Push cache [%d] into DB[ - blog id [%d], view [%d] - ]", b1.Views, b.Id, b.Views)
+			b.Views = b1.Views
+		}
+	}
 	_, err := orm.NewOrm().Update(b)
 	if err == nil {
 		g.BlogCacheDel(fmt.Sprintf("%d", b.Id))
