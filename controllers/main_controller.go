@@ -42,6 +42,7 @@ func (this *MainController) Read() {
 	if bg := g.BlogCacheGet(fmt.Sprintf("%d", b.Id)); bg != nil {
 		b1 := bg.(models.Blog)
 		b1.Views = b1.Views + 1
+		b.Views = b1.Views
 
 		g.BlogCachePut(fmt.Sprintf("%d", b.Id), b1)
 	}
