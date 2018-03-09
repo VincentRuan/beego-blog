@@ -6,10 +6,10 @@ vincent's blog use beego framework
 ## install
 
 ```
-mkdir -p $GOPATH/src/github.com/vincent3i
-cd $GOPATH/src/github.com/vincent3i
-git clone https://github.com/vincent3i/beego-blog.git
-go get github.com/vincent3i/beego-blog/...
+mkdir -p $GOPATH/src/github.com/vincentruan
+cd $GOPATH/src/github.com/vincentruan
+git clone https://github.com/vincentruan/beego-blog.git
+go get github.com/vincentruan/beego-blog/...
 cd beego-blog && modify conf/app.conf
 bee run
 ```

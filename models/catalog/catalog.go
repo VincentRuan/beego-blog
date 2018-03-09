@@ -3,12 +3,12 @@ package catalog
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/vincent3i/beego-blog/g"
+	"github.com/vincentruan/beego-blog/g"
 	"net/url"
 	//.表示可以不用带包名访问里面的变量方法
 	"github.com/astaxie/beego/orm"
 	"github.com/qiniu/api/rs"
-	. "github.com/vincent3i/beego-blog/models"
+	. "github.com/vincentruan/beego-blog/models"
 )
 
 func OneById(id int64) *Catalog {

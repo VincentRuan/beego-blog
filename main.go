@@ -3,13 +3,13 @@ package main
 import (
 	"github.com/astaxie/beego"
 	_ "github.com/astaxie/beego/session/redis"
-	"github.com/vincent3i/beego-blog/engine"
-	"github.com/vincent3i/beego-blog/g"
-	"github.com/vincent3i/beego-blog/nsq/consumer"
-	"github.com/vincent3i/beego-blog/nsq/producer"
-	_ "github.com/vincent3i/beego-blog/routers"
-	"github.com/vincent3i/beego-blog/task"
-	"github.com/vincent3i/beego-blog/utilities/mongo"
+	"github.com/vincentruan/beego-blog/engine"
+	"github.com/vincentruan/beego-blog/g"
+	"github.com/vincentruan/beego-blog/nsq/consumer"
+	"github.com/vincentruan/beego-blog/nsq/producer"
+	_ "github.com/vincentruan/beego-blog/routers"
+	"github.com/vincentruan/beego-blog/task"
+	"github.com/vincentruan/beego-blog/utilities/mongo"
 )
 
 func main() {

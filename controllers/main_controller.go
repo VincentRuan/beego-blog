@@ -3,11 +3,11 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/vincent3i/beego-blog/engine"
-	"github.com/vincent3i/beego-blog/g"
-	"github.com/vincent3i/beego-blog/models"
-	"github.com/vincent3i/beego-blog/models/blog"
-	"github.com/vincent3i/beego-blog/models/catalog"
+	"github.com/vincentruan/beego-blog/engine"
+	"github.com/vincentruan/beego-blog/g"
+	"github.com/vincentruan/beego-blog/models"
+	"github.com/vincentruan/beego-blog/models/blog"
+	"github.com/vincentruan/beego-blog/models/catalog"
 	"time"
 )
 

@@ -3,7 +3,7 @@ package g
 import (
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/vincent3i/beego-blog/cache"
+	"github.com/vincentruan/beego-blog/cache"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/astaxie/beego"
 	"github.com/bitly/go-nsq"
-	"github.com/vincent3i/beego-blog/g"
+	"github.com/vincentruan/beego-blog/g"
 	"gopkg.in/vmihailenco/msgpack.v2"
 )
 

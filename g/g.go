@@ -8,7 +8,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/square/go-jose"
-	_ "github.com/vincent3i/beego-blog/cache"
+	_ "github.com/vincentruan/beego-blog/cache"
 	"io/ioutil"
 	"strings"
 )

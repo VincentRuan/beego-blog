@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/ulricqin/goutils/paginator"
-	"github.com/vincent3i/beego-blog/g"
-	"github.com/vincent3i/beego-blog/models/admin"
+	"github.com/vincentruan/beego-blog/g"
+	"github.com/vincentruan/beego-blog/models/admin"
 	"strconv"
 )
 

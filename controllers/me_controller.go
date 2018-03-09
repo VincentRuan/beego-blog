@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/vincent3i/beego-blog/engine"
+	"github.com/vincentruan/beego-blog/engine"
 )
 
 type MeController struct {

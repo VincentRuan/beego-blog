@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/olivere/elastic"
-	"github.com/vincent3i/beego-blog/models"
-	"github.com/vincent3i/beego-blog/models/blog"
-	"github.com/vincent3i/beego-blog/nsq/producer"
+	"github.com/vincentruan/beego-blog/models"
+	"github.com/vincentruan/beego-blog/models/blog"
+	"github.com/vincentruan/beego-blog/nsq/producer"
 	"strconv"
 )
 

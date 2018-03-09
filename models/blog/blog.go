@@ -5,8 +5,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/ulricqin/goutils/strtool"
-	"github.com/vincent3i/beego-blog/g"
-	. "github.com/vincent3i/beego-blog/models"
+	"github.com/vincentruan/beego-blog/g"
+	. "github.com/vincentruan/beego-blog/models"
 	"time"
 )
 

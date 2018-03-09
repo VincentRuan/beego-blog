@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/vincent3i/beego-blog/models/admin"
+	"github.com/vincentruan/beego-blog/models/admin"
 )
 
 type LoginController struct {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	. "github.com/vincent3i/beego-blog/models"
+	. "github.com/vincentruan/beego-blog/models"
 	"net/url"
 	"strings"
 	"time"

@@ -3,8 +3,8 @@ package handler
 import (
 	"github.com/astaxie/beego"
 	rss "github.com/jteeuwen/go-pkg-rss"
-	"github.com/vincent3i/beego-blog/models"
-	"github.com/vincent3i/beego-blog/utilities/mongo"
+	"github.com/vincentruan/beego-blog/models"
+	"github.com/vincentruan/beego-blog/utilities/mongo"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"

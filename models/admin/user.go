@@ -2,7 +2,7 @@ package admin
 
 import (
 	"github.com/astaxie/beego"
-	"github.com/vincent3i/beego-blog/utilities/mongo"
+	"github.com/vincentruan/beego-blog/utilities/mongo"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
